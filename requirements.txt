@@ -1,6 +1,5 @@
 Flask
 PyPDF2
 python-docx
-nltk
 reportlab
 scikit-learn
