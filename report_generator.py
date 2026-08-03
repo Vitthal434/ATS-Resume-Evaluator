@@ -1,13 +1,70 @@
 import os
+
 from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
 from reportlab.platypus import (
-    SimpleDocTemplate,
     Paragraph,
+    SimpleDocTemplate,
     Spacer,
     Table,
-    TableStyle
+    TableStyle,
 )
+
+BRAND_NAME = "ATS Resume Evaluator"
+REPORT_FILE_PATH = os.path.join("reports", "ATS_Report.pdf")
+
+PRIMARY_COLOR = colors.HexColor("#1d4ed8")
+TEXT_COLOR = colors.HexColor("#172033")
+MUTED_COLOR = colors.HexColor("#64748b")
+BORDER_COLOR = colors.HexColor("#dbe3ef")
+SURFACE_COLOR = colors.HexColor("#f8fafc")
+
+
+def _build_table(data, column_widths=None, header=True):
+    """Create a consistently styled report table."""
+    table = Table(data, colWidths=column_widths, hAlign="LEFT")
+    table_style = [
+        ("GRID", (0, 0), (-1, -1), 0.5, BORDER_COLOR),
+        ("FONTNAME", (0, 0), (-1, -1), "Helvetica"),
+        ("FONTSIZE", (0, 0), (-1, -1), 10),
+        ("TEXTCOLOR", (0, 0), (-1, -1), TEXT_COLOR),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 10),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+        ("TOPPADDING", (0, 0), (-1, -1), 8),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, SURFACE_COLOR]),
+    ]
+
+    if header:
+        table_style.extend(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), PRIMARY_COLOR),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ]
+        )
+
+    table.setStyle(TableStyle(table_style))
+    return table
+
+
+def _add_section_title(story, title, styles):
+    """Add a section heading with consistent spacing."""
+    story.append(Spacer(1, 14))
+    story.append(Paragraph(f"<b>{title}</b>", styles["Heading2"]))
+    story.append(Spacer(1, 8))
+
+
+def _add_list_items(story, items, empty_message, marker, styles):
+    """Add simple list rows to the PDF story."""
+    if items:
+        for item in items:
+            story.append(Paragraph(f"{marker} {item}", styles["Normal"]))
+    else:
+        story.append(Paragraph(empty_message, styles["Normal"]))
 
 
 def generate_report(
@@ -19,188 +76,101 @@ def generate_report(
     matched,
     missing,
     suggestions,
-    recommended_jobs
+    recommended_jobs,
 ):
     """
     Generate the ATS analysis PDF and return its file path.
     """
-
-    # Ensure the reports folder exists before writing the PDF.
     os.makedirs("reports", exist_ok=True)
 
-    file_path = os.path.join("reports", "ATS_Report.pdf")
-
-    pdf = SimpleDocTemplate(file_path)
-
+    pdf = SimpleDocTemplate(
+        REPORT_FILE_PATH,
+        pagesize=letter,
+        rightMargin=0.65 * inch,
+        leftMargin=0.65 * inch,
+        topMargin=0.65 * inch,
+        bottomMargin=0.65 * inch,
+    )
     styles = getSampleStyleSheet()
+    styles["Title"].textColor = PRIMARY_COLOR
+    styles["Title"].fontSize = 22
+    styles["Title"].leading = 28
+    styles["Heading2"].textColor = TEXT_COLOR
+    styles["Heading2"].fontSize = 14
+    styles["Heading2"].leading = 18
+    styles["Normal"].textColor = TEXT_COLOR
+    styles["Normal"].fontSize = 10
+    styles["Normal"].leading = 15
+    styles["Italic"].textColor = MUTED_COLOR
 
     story = []
 
-    # Report header
-
+    story.append(Paragraph(f"<b>{BRAND_NAME}</b>", styles["Title"]))
     story.append(
-        Paragraph("<b><font size=20>ATS Resume Evaluator</font></b>",
-                  styles["Title"])
+        Paragraph("Professional ATS Resume Analysis Report", styles["Heading2"])
     )
-
+    story.append(Spacer(1, 8))
     story.append(
-        Paragraph("ATS Resume Analysis Report", styles["Heading2"])
+        Paragraph(
+            "A concise summary of resume alignment, skill coverage, "
+            "experience relevance, and recommended job roles.",
+            styles["Normal"],
+        )
     )
+    story.append(Spacer(1, 18))
 
-    story.append(Spacer(1, 20))
-
-    # Summary scores
-
+    _add_section_title(story, "Score Summary", styles)
     score_table = [
-
         ["ATS Score", f"{score}%"],
-
         ["Category", category],
-
         ["Skill Score", f"{skill_score}%"],
-
         ["Text Similarity", f"{text_similarity}%"],
-
-        ["Experience Score", f"{experience_score}%"]
-
+        ["Experience Score", f"{experience_score}%"],
     ]
-
-    table = Table(score_table)
-
-    table.setStyle(TableStyle([
-
-        ("BACKGROUND", (0, 0), (-1, 0), colors.lightblue),
-
-        ("GRID", (0, 0), (-1, -1), 1, colors.black),
-
-        ("BACKGROUND", (0, 1), (-1, -1), colors.whitesmoke),
-
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
-
-    ]))
-
-    story.append(table)
-
-    story.append(Spacer(1, 20))
-
-    # Skills found in both the resume and job description.
-
     story.append(
-        Paragraph("<b>Matched Skills</b>", styles["Heading2"])
+        _build_table(score_table, column_widths=[2.3 * inch, 3.6 * inch])
     )
 
-    if matched:
+    _add_section_title(story, "Matched Skills", styles)
+    _add_list_items(story, matched, "No matched skills found.", "+", styles)
 
-        for skill in matched:
+    _add_section_title(story, "Missing Skills", styles)
+    _add_list_items(story, missing, "No missing skills.", "-", styles)
 
-            story.append(
-                Paragraph(f"✔ {skill}", styles["Normal"])
-            )
+    _add_section_title(story, "Suggestions", styles)
+    _add_list_items(story, suggestions, "No suggestions available.", "-", styles)
 
-    else:
-
-        story.append(
-            Paragraph("No matched skills found.", styles["Normal"])
-        )
-
-    story.append(Spacer(1, 20))
-
-    # Skills requested by the job description but missing from the resume.
-
-    story.append(
-        Paragraph("<b>Missing Skills</b>", styles["Heading2"])
-    )
-
-    if missing:
-
-        for skill in missing:
-
-            story.append(
-                Paragraph(f"✘ {skill}", styles["Normal"])
-            )
-
-    else:
-
-        story.append(
-            Paragraph("No missing skills.", styles["Normal"])
-        )
-
-    story.append(Spacer(1, 20))
-
-    # Improvement suggestions based on the match result.
-
-    story.append(
-        Paragraph("<b>Suggestions</b>", styles["Heading2"])
-    )
-
-    if suggestions:
-
-        for item in suggestions:
-
-            story.append(
-                Paragraph(f"• {item}", styles["Normal"])
-            )
-
-    else:
-
-        story.append(
-            Paragraph("No suggestions available.", styles["Normal"])
-        )
-
-    story.append(Spacer(1, 20))
-
-    # Job roles ranked by skill overlap.
-
-    story.append(
-        Paragraph("<b>Recommended Jobs</b>", styles["Heading2"])
-    )
-
+    _add_section_title(story, "Recommended Jobs", styles)
     if recommended_jobs:
-
         job_table = [["Job Role", "Match Score"]]
 
         for job in recommended_jobs:
+            job_table.append(
+                [
+                    job["job"],
+                    f'{job["score"]}%',
+                ]
+            )
 
-            job_table.append([
-                job["job"],
-                f'{job["score"]}%'
-            ])
-
-        table = Table(job_table)
-
-        table.setStyle(TableStyle([
-
-            ("BACKGROUND", (0, 0), (-1, 0), colors.darkblue),
-
-            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-
-            ("GRID", (0, 0), (-1, -1), 1, colors.black),
-
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-
-            ("BOTTOMPADDING", (0, 0), (-1, 0), 10),
-
-        ]))
-
-        story.append(table)
-
+        story.append(
+            _build_table(
+                job_table,
+                column_widths=[4.0 * inch, 1.9 * inch],
+            )
+        )
     else:
-
         story.append(
             Paragraph("No recommendations available.", styles["Normal"])
         )
 
-    story.append(Spacer(1, 30))
-
-    # Footer
-
+    story.append(Spacer(1, 24))
     story.append(
         Paragraph(
-            "<b>Generated by ATS Resume Evaluator</b>",
-            styles["Italic"]
+            f"<b>Generated by {BRAND_NAME}</b>",
+            styles["Italic"],
         )
     )
 
     pdf.build(story)
 
-    return file_path
+    return REPORT_FILE_PATH
