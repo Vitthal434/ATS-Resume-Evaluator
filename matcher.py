@@ -1,0 +1,188 @@
+import re
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+SKILL_CATEGORIES = {
+    "programming_languages": {
+        "python",
+        "java",
+        "c",
+        "c++",
+        "javascript",
+        "typescript",
+    },
+    "frontend": {
+        "html",
+        "css",
+        "bootstrap",
+        "tailwind",
+        "react",
+        "angular",
+        "vue",
+    },
+    "backend": {
+        "flask",
+        "django",
+        "fastapi",
+        "node",
+        "express",
+        "api",
+        "rest api",
+    },
+    "databases": {
+        "sql",
+        "mysql",
+        "postgresql",
+        "mongodb",
+        "sqlite",
+    },
+    "ai_ml": {
+        "machine learning",
+        "deep learning",
+        "data science",
+        "artificial intelligence",
+        "nlp",
+        "computer vision",
+    },
+    "python_libraries": {
+        "numpy",
+        "pandas",
+        "matplotlib",
+        "seaborn",
+        "scikit-learn",
+        "tensorflow",
+        "keras",
+        "pytorch",
+    },
+    "data_analytics": {
+        "power bi",
+        "tableau",
+        "excel",
+    },
+    "cloud_devops": {
+        "aws",
+        "docker",
+        "kubernetes",
+    },
+    "version_control": {
+        "git",
+        "github",
+    },
+    "operating_systems": {
+        "linux",
+    },
+    "soft_skills": {
+        "communication",
+        "leadership",
+        "problem solving",
+        "teamwork",
+        "critical thinking",
+    },
+    "other": {
+        "oop",
+        "dsa",
+    },
+}
+
+SKILLS = set().union(*SKILL_CATEGORIES.values())
+
+
+def preprocess(text):
+    """Normalize text for keyword and skill matching."""
+    text = text.lower()
+    text = re.sub(r"[^a-zA-Z0-9+# ]", " ", text)
+    return text
+
+
+def extract_skills(text):
+    """Return skills from the database that appear in the provided text."""
+    normalized_text = preprocess(text)
+    found_skills = set()
+
+    for skill in SKILLS:
+        if skill in normalized_text:
+            found_skills.add(skill)
+
+    return found_skills
+
+
+def calculate_text_similarity(resume, job):
+    """Calculate TF-IDF cosine similarity between resume and job description."""
+    documents = [resume, job]
+    vectorizer = TfidfVectorizer(stop_words="english")
+    tfidf_matrix = vectorizer.fit_transform(documents)
+    similarity = cosine_similarity(tfidf_matrix[0], tfidf_matrix[1])[0][0]
+
+    return round(similarity * 100, 2)
+
+
+def calculate_skill_match(resume, job):
+    """Compare extracted resume skills against extracted job skills."""
+    resume_skills = extract_skills(resume)
+    job_skills = extract_skills(job)
+
+    if len(job_skills) == 0:
+        return 0, [], []
+
+    matched_skills = sorted(list(resume_skills & job_skills))
+    missing_skills = sorted(list(job_skills - resume_skills))
+    skill_score = round((len(matched_skills) / len(job_skills)) * 100, 2)
+
+    return skill_score, matched_skills, missing_skills
+
+
+def experience_score(resume):
+    """Estimate experience score from years of experience mentioned in resume."""
+    years = re.findall(r"(\d+)\s*\+?\s*years?", resume.lower())
+
+    if not years:
+        return 50
+
+    return min(int(years[0]) * 10, 100)
+
+
+def final_match_score(resume, job):
+    """Calculate final ATS score and return detailed match results."""
+    text_score = calculate_text_similarity(resume, job)
+    skill_score, matched_skills, missing_skills = calculate_skill_match(resume, job)
+    exp_score = experience_score(resume)
+    final_score = round(
+        (0.50 * skill_score) +
+        (0.30 * text_score) +
+        (0.20 * exp_score),
+        2,
+    )
+
+    suggestions = []
+
+    if len(missing_skills):
+        suggestions.append(
+            "Consider adding these skills: " +
+            ", ".join(missing_skills)
+        )
+
+    if exp_score < 60:
+        suggestions.append(
+            "Highlight internships, projects or practical experience."
+        )
+
+    if final_score > 85:
+        recommendation = "Excellent Match"
+    elif final_score > 70:
+        recommendation = "Good Match"
+    elif final_score > 50:
+        recommendation = "Average Match"
+    else:
+        recommendation = "Low Match"
+
+    return {
+        "ats_score": final_score,
+        "text_similarity": text_score,
+        "skill_score": skill_score,
+        "experience_score": exp_score,
+        "matched_skills": matched_skills,
+        "missing_skills": missing_skills,
+        "recommendation": recommendation,
+        "suggestions": suggestions,
+    }
