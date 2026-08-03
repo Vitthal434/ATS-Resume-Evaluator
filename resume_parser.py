@@ -5,9 +5,10 @@ import string
 import PyPDF2
 import docx
 import nltk
-
-nltk.download("stopwords")
 from nltk.corpus import stopwords
+
+nltk.download("stopwords", quiet=True)
+ENGLISH_STOPWORDS = set(stopwords.words("english"))
 
 
 def read_pdf(file):
@@ -36,11 +37,10 @@ def read_docx(file):
 def clean_text(text):
     """Normalize text by lowercasing, removing punctuation, and filtering stopwords."""
     try:
-        english_stopwords = stopwords.words("english")
         text = text.lower()
         text = text.translate(str.maketrans("", "", string.punctuation))
         words = text.split()
-        words = [word for word in words if word not in english_stopwords]
+        words = [word for word in words if word not in ENGLISH_STOPWORDS]
         return " ".join(words)
     except Exception as exc:
         raise ValueError("Unable to clean resume text.") from exc

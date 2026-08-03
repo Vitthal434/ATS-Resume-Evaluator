@@ -128,8 +128,8 @@ JOB_DATABASE = {
 
 def recommend_jobs(resume_skills):
     """Return the top five job recommendations for the provided resume skills."""
-    recommendations = []
     normalized_resume_skills = set(skill.lower() for skill in resume_skills)
+    recommendations = []
 
     for job, required_skills in JOB_DATABASE.items():
         normalized_required_skills = set(skill.lower() for skill in required_skills)
@@ -154,7 +154,12 @@ def recommend_jobs(resume_skills):
         reverse=True,
     )
 
-    for recommendation in recommendations:
-        recommendation.pop("matched_count")
+    top_recommendations = recommendations[:5]
 
-    return recommendations[:5]
+    return [
+        {
+            "job": recommendation["job"],
+            "score": recommendation["score"],
+        }
+        for recommendation in top_recommendations
+    ]

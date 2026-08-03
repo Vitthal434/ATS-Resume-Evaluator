@@ -3,6 +3,10 @@ import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+SKILL_WEIGHT = 0.50
+TEXT_WEIGHT = 0.30
+EXPERIENCE_WEIGHT = 0.20
+
 SKILL_CATEGORIES = {
     "programming_languages": {
         "python",
@@ -122,11 +126,11 @@ def calculate_skill_match(resume, job):
     resume_skills = extract_skills(resume)
     job_skills = extract_skills(job)
 
-    if len(job_skills) == 0:
+    if not job_skills:
         return 0, [], []
 
-    matched_skills = sorted(list(resume_skills & job_skills))
-    missing_skills = sorted(list(job_skills - resume_skills))
+    matched_skills = sorted(resume_skills & job_skills)
+    missing_skills = sorted(job_skills - resume_skills)
     skill_score = round((len(matched_skills) / len(job_skills)) * 100, 2)
 
     return skill_score, matched_skills, missing_skills
@@ -148,15 +152,15 @@ def final_match_score(resume, job):
     skill_score, matched_skills, missing_skills = calculate_skill_match(resume, job)
     exp_score = experience_score(resume)
     final_score = round(
-        (0.50 * skill_score) +
-        (0.30 * text_score) +
-        (0.20 * exp_score),
+        (SKILL_WEIGHT * skill_score) +
+        (TEXT_WEIGHT * text_score) +
+        (EXPERIENCE_WEIGHT * exp_score),
         2,
     )
 
     suggestions = []
 
-    if len(missing_skills):
+    if missing_skills:
         suggestions.append(
             "Consider adding these skills: " +
             ", ".join(missing_skills)
