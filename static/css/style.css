@@ -412,108 +412,290 @@ Hero Section
 
 /* ---------- ResumeIQ Premium Hero ---------- */
 
-.gradient-text{
+.gradient-text {
+  background: linear-gradient(90deg, #4f46e5, #06b6d4);
 
-background:linear-gradient(
-90deg,
-#4f46e5,
-#06b6d4
-);
+  background-clip: text;
+  -webkit-background-clip: text;
 
--webkit-background-clip:text;
-
--webkit-text-fill-color:transparent;
-
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
-.hero-btn{
+.hero-btn {
+  padding: 15px 34px;
 
-padding:15px 34px;
+  border-radius: 15px;
 
-border-radius:15px;
+  font-weight: 700;
 
-font-weight:700;
-
-box-shadow:0 20px 40px rgba(79,70,229,.25);
-
+  box-shadow: 0 20px 40px rgba(79, 70, 229, 0.25);
 }
 
-.hero-btn:hover{
-
-transform:translateY(-4px);
-
+.hero-btn:hover {
+  transform: translateY(-4px);
 }
 
-.hero-btn-secondary{
+.hero-btn-secondary {
+  padding: 15px 34px;
 
-padding:15px 34px;
+  border-radius: 15px;
 
-border-radius:15px;
-
-font-weight:700;
-
+  font-weight: 700;
 }
 
-.preview-card{
+.preview-card {
+  position: relative;
 
-position:relative;
-
-overflow:hidden;
-
+  overflow: hidden;
 }
 
-.preview-card::before{
+.preview-card::before {
+  content: "";
 
-content:"";
+  position: absolute;
 
-position:absolute;
+  top: -100px;
 
-top:-100px;
+  right: -100px;
 
-right:-100px;
+  width: 220px;
 
-width:220px;
+  height: 220px;
 
-height:220px;
+  background: #dbeafe;
 
-background:#dbeafe;
+  border-radius: 50%;
 
-border-radius:50%;
-
-opacity:.6;
-
+  opacity: 0.6;
 }
 
-.live-badge{
+.live-badge {
+  float: right;
 
-float:right;
+  background: #dcfce7;
 
-background:#dcfce7;
+  color: #15803d;
 
-color:#15803d;
+  padding: 6px 12px;
 
-padding:6px 12px;
+  border-radius: 30px;
 
-border-radius:30px;
+  font-size: 0.75rem;
 
-font-size:.75rem;
-
-font-weight:700;
-
+  font-weight: 700;
 }
 
-.preview-skills span{
-
-transition:.3s;
-
+.preview-skills span {
+  transition: 0.3s;
 }
 
-.preview-skills span:hover{
+.preview-skills span:hover {
+  transform: scale(1.08);
 
-transform:scale(1.08);
+  background: #2563eb;
 
-background:#2563eb;
+  color: white;
+}
 
-color:white;
+/*======================
+Trust Section
+=======================*/
 
+.trust-section {
+  padding: 70px 0;
+
+  background: #ffffff;
+}
+
+.trust-card {
+  padding: 35px;
+
+  border-radius: 20px;
+
+  background: white;
+
+  text-align: center;
+
+  border: 1px solid #eef2ff;
+
+  position: relative;
+
+  overflow: hidden;
+
+  transition: 0.35s;
+
+  height: 100%;
+}
+
+.trust-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+
+  left: 0;
+
+  width: 100%;
+
+  height: 5px;
+
+  background: linear-gradient(90deg, #4f46e5, #00c2a8);
+}
+
+.trust-card:hover {
+  transform: translateY(-8px);
+
+  box-shadow: 0 25px 50px rgba(79, 70, 229, 0.08);
+}
+
+.trust-card h2 {
+  font-size: 2.5rem;
+
+  font-weight: 800;
+
+  color: #4f46e5;
+
+  margin-bottom: 15px;
+}
+
+.trust-card p {
+  margin: 0;
+
+  color: #6b7280;
+}
+
+/*============================
+Upload Section
+=============================*/
+
+.upload-section {
+  background: #f8fbff;
+
+  padding: 90px 0;
+}
+
+.upload-box {
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: center;
+
+  height: 320px;
+
+  border: 2px dashed #cbd5e1;
+
+  border-radius: 28px;
+
+  background: white;
+
+  cursor: pointer;
+
+  transition: 0.35s;
+}
+
+.upload-box:hover {
+  border-color: #4f46e5;
+
+  transform: translateY(-6px);
+
+  box-shadow: 0 20px 40px rgba(79, 70, 229, 0.08);
+}
+
+.upload-icon {
+  font-size: 4rem;
+
+  color: #4f46e5;
+
+  margin-bottom: 20px;
+}
+
+.upload-box h4 {
+  font-weight: 700;
+}
+
+.upload-box p {
+  color: #64748b;
+
+  margin: 8px 0;
+}
+
+.selected-file {
+  margin-top: 20px;
+
+  text-align: center;
+
+  font-weight: 600;
+
+  color: #4f46e5;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Drag & Drop Active */
+
+.upload-box.dragover {
+  border: 2px solid #4f46e5;
+
+  background: #eef4ff;
+
+  transform: scale(1.02);
+
+  box-shadow: 0 20px 45px rgba(79, 70, 229, 0.15);
+}
+
+.upload-box.dragover .upload-icon {
+  transform: scale(1.15);
+
+  transition: 0.3s;
+}
+
+.selected-file {
+  margin-top: 20px;
+
+  font-weight: 600;
+
+  color: #4f46e5;
+
+  min-height: 24px;
+}
+
+.footer {
+  background: #0f172a;
+
+  color: white;
+}
+
+.footer a {
+  color: #cbd5e1;
+
+  text-decoration: none;
+
+  transition: 0.3s;
+}
+
+.footer a:hover {
+  color: white;
+
+  padding-left: 5px;
+}
+
+.footer .badge {
+  padding: 10px 14px;
+
+  font-size: 0.85rem;
+}
+
+.footer hr {
+  border-color: #334155;
+}
+
+.footer .text-muted {
+  color: #94a3b8 !important;
 }

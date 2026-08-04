@@ -252,6 +252,48 @@
         </div>
       </section>
 
+      <!--=================================
+      ResumeIQ Trust Section
+===================================-->
+
+      <section class="trust-section">
+        <div class="container">
+          <div class="row g-4">
+            <div class="col-md-3">
+              <div class="trust-card">
+                <h2>95%</h2>
+
+                <p>Average ATS Match Improvement</p>
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="trust-card">
+                <h2>PDF</h2>
+
+                <p>Supports PDF & DOCX Resumes</p>
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="trust-card">
+                <h2><10s</h2>
+
+                <p>Typical Resume Analysis Time</p>
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="trust-card">
+                <h2>AI</h2>
+
+                <p>Smart Skill Gap Detection</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="features" class="py-5">
         <div class="container">
           <div class="row text-center mb-5">
@@ -309,6 +351,79 @@
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- ================= Upload Resume ================= -->
+
+      <section id="analyze" class="upload-section py-5">
+        <div class="container">
+          <div class="text-center mb-5">
+            <span class="hero-badge"> Resume Analysis </span>
+
+            <h2 class="display-5 fw-bold mt-3">
+              Ready to Analyze Your Resume?
+            </h2>
+
+            <p class="text-muted">
+              Upload your resume and paste the target job description to receive
+              an ATS compatibility report.
+            </p>
+          </div>
+
+          <form action="/match" method="POST" enctype="multipart/form-data">
+            <div class="row g-4">
+              <div class="col-lg-5">
+                <label class="upload-box" for="resume">
+                  <i class="bi bi-cloud-arrow-up-fill upload-icon"></i>
+
+                  <h4>Drop Resume Here</h4>
+
+                  <p>or click to browse</p>
+
+                  <small> PDF • DOCX </small>
+
+                  <input
+                    type="file"
+                    id="resume"
+                    name="resume"
+                    accept=".pdf,.doc,.docx"
+                    hidden
+                    required
+                  />
+                </label>
+
+                <div id="selected-file" class="selected-file">
+                  No file selected
+                </div>
+
+                <button
+                  type="button"
+                  id="remove-file"
+                  class="btn btn-sm btn-outline-danger mt-3"
+                  style="display: none"
+                >
+                  Remove File
+                </button>
+              </div>
+
+              <div class="col-lg-7">
+                <label class="form-label fw-semibold"> Job Description </label>
+
+                <textarea
+                  class="form-control"
+                  name="job_description"
+                  rows="10"
+                  placeholder="Paste the complete job description here..."
+                  required
+                ></textarea>
+
+                <button class="btn hero-btn mt-4 w-100" type="submit">
+                  Analyze Resume
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
       </section>
 
@@ -468,11 +583,56 @@
       {% endif %}
     </main>
 
-    <footer class="footer py-4 border-top bg-white">
-      <div class="container text-center">
-        <p class="mb-0">
-          ResumeIQ helps job seekers turn resume feedback into focused next
-          steps.
+    <footer class="footer py-5 mt-5">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-5">
+            <h4 class="fw-bold gradient-text">ResumeIQ</h4>
+
+            <p class="text-muted mt-3">
+              AI-powered resume intelligence that helps job seekers improve ATS
+              compatibility, identify skill gaps, and prepare stronger
+              applications.
+            </p>
+          </div>
+
+          <div class="col-lg-3">
+            <h5 class="fw-bold mb-3">Quick Links</h5>
+
+            <ul class="list-unstyled">
+              <li><a href="#features">Features</a></li>
+
+              <li><a href="#analyze">Analyze Resume</a></li>
+
+              {% if score %}
+              <li><a href="#report">Report</a></li>
+              {% endif %}
+            </ul>
+          </div>
+
+          <div class="col-lg-4">
+            <h5 class="fw-bold mb-3">Built With</h5>
+
+            <div class="d-flex flex-wrap gap-2">
+              <span class="badge bg-primary">Flask</span>
+
+              <span class="badge bg-primary">Bootstrap</span>
+
+              <span class="badge bg-primary">JavaScript</span>
+
+              <span class="badge bg-primary">Python</span>
+            </div>
+
+            <p class="mt-4 text-muted">
+              Made by <strong>VAIBHAV PANDEY</strong>
+            </p>
+          </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <p class="text-center text-muted mb-0">
+          © 2026 ResumeIQ. All Rights Reserved.
         </p>
       </div>
     </footer>
