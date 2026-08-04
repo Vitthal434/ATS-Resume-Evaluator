@@ -2,151 +2,483 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>ATS Resume Evaluator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ResumeIQ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
+      href="{{ url_for('static', filename='css/style.css') }}"
     />
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dashboard.css') }}"
+    />
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/animations.css') }}"
+    />
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        background: #f6f8fb;
+      }
+
+      .navbar-brand span,
+      .text-brand {
+        color: #2563eb;
+      }
+
+      .hero-section {
+        padding: 96px 0 64px;
+      }
+
+      .hero-badge {
+        background: #eaf1ff;
+        color: #1d4ed8;
+      }
+
+      .hero-title {
+        color: #111827;
+        font-size: clamp(2.4rem, 5vw, 4.75rem);
+        font-weight: 800;
+        letter-spacing: 0;
+        line-height: 1.05;
+      }
+
+      .hero-copy {
+        color: #5b6475;
+        font-size: 1.08rem;
+      }
+
+      .app-card {
+        border: 1px solid #e3e8f2;
+        border-radius: 18px;
+        box-shadow: 0 18px 48px rgba(15, 23, 42, 0.1);
+      }
+
+      .form-control,
+      .form-label {
+        font-size: 0.95rem;
+      }
+
+      .form-control {
+        border-color: #d8e0ec;
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+      }
+
+      .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.12);
+      }
+
+      textarea.form-control {
+        min-height: 220px;
+      }
+
+      .btn-brand {
+        background: #2563eb;
+        border-color: #2563eb;
+        border-radius: 12px;
+        color: #ffffff;
+        font-weight: 700;
+        padding: 0.9rem 1.25rem;
+      }
+
+      .btn-brand:hover,
+      .btn-brand:focus {
+        background: #1d4ed8;
+        border-color: #1d4ed8;
+        color: #ffffff;
+      }
+
+      .metric-card {
+        border: 1px solid #e3e8f2;
+        border-radius: 16px;
+      }
+
+      .score-display {
+        color: #15803d;
+        font-size: clamp(3rem, 8vw, 5rem);
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .section-title {
+        color: #111827;
+        font-weight: 700;
+      }
+
+      .muted-text {
+        color: #64748b;
+      }
+
+      .footer {
+        color: #64748b;
+      }
+    </style>
   </head>
   <body>
-    <div class="container">
-      <header>
-        <h1>ATS Resume Evaluator</h1>
-        <p class="subtitle">
-          Compare your resume against a job description and identify the skills,
-          experience signals, and improvements that matter most.
+    <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+      <div class="container py-2">
+        <a
+          class="navbar-brand fw-bold d-flex align-items-center gap-2"
+          href="/"
+        >
+          <i class="bi bi-stars text-brand"></i>
+          <span>ResumeIQ</span>
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#mainNavbar"
+          aria-controls="mainNavbar"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNavbar">
+          <div class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+            <a class="nav-link" href="#analyze">Analyze</a>
+            {% if score %}
+            <a class="nav-link" href="#report">Report</a>
+            {% endif %}
+            <a class="btn btn-brand btn-sm px-3" href="#analyze">
+              Get Started
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <!-- ================= HERO SECTION ================= -->
+
+      <section class="hero">
+        <div class="container">
+          <div class="row align-items-center gy-5">
+            <!-- Left Side -->
+
+            <div class="col-lg-6">
+              <span class="hero-badge">
+                🚀 AI Powered Resume Intelligence
+              </span>
+
+              <h1 class="hero-title mt-4">
+                Land More Interviews with
+                <span class="gradient-text">ResumeIQ</span>
+              </h1>
+
+              <p class="hero-description">
+                ResumeIQ analyzes your resume against job descriptions,
+                identifies missing skills, calculates ATS compatibility, and
+                provides actionable recommendations to maximize your chances of
+                getting shortlisted.
+              </p>
+
+              <div class="hero-buttons">
+                <a href="#analyze" class="btn btn-primary btn-lg hero-btn">
+                  <i class="bi bi-stars me-2"></i>
+
+                  Analyze Resume
+                </a>
+
+                <a
+                  href="#features"
+                  class="btn btn-light btn-lg hero-btn-secondary"
+                >
+                  Learn More
+                </a>
+              </div>
+            </div>
+
+            <!-- Right Side -->
+
+            <div class="col-lg-6">
+              <div class="preview-card">
+                <div class="preview-header">
+                  ResumeIQ Analysis
+
+                  <span class="live-badge"> Live Demo </span>
+                </div>
+
+                <div class="preview-score">91%</div>
+
+                <div class="progress mb-4">
+                  <div class="progress-bar bg-success" style="width: 91%"></div>
+                </div>
+
+                <p class="preview-text">Excellent ATS Compatibility</p>
+
+                <hr />
+
+                <div class="preview-skills">
+                  <span>Python</span>
+
+                  <span>Flask</span>
+
+                  <span>Git</span>
+
+                  <span>Docker</span>
+
+                  <span>REST API</span>
+
+                  <span>AWS</span>
+
+                  <span>MySQL</span>
+
+                  <span>Problem Solving</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="py-5">
+        <div class="container">
+          <div class="row text-center mb-5">
+            <h2 class="fw-bold">Everything you need to optimize your resume</h2>
+
+            <p class="text-muted">AI-powered insights to help you stand out.</p>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-md-3">
+              <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                  <i class="bi bi-graph-up-arrow fs-1 text-primary"></i>
+
+                  <h5 class="mt-3">ATS Analysis</h5>
+
+                  <p>Measure resume compatibility with modern ATS systems.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                  <i class="bi bi-stars fs-1 text-primary"></i>
+
+                  <h5 class="mt-3">Skill Matching</h5>
+
+                  <p>Identify strengths and missing skills instantly.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                  <i class="bi bi-file-earmark-pdf fs-1 text-primary"></i>
+
+                  <h5 class="mt-3">PDF Reports</h5>
+
+                  <p>Generate downloadable ATS analysis reports.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                  <i class="bi bi-briefcase fs-1 text-primary"></i>
+
+                  <h5 class="mt-3">Job Suggestions</h5>
+
+                  <p>Discover relevant job roles based on your resume.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {% if score %}
+      <section class="py-5" id="report">
+        <div class="container">
+          <div class="text-center mb-5">
+            <span class="badge rounded-pill hero-badge mb-3 px-3 py-2">
+              Resume Match Report
+            </span>
+            <h2 class="section-title display-6 mb-3">
+              Your ResumeIQ analysis is ready.
+            </h2>
+            <p class="muted-text mb-0">
+              Review your ATS score, skill alignment, experience relevance, and
+              recommended roles.
+            </p>
+          </div>
+
+          <div class="row g-4 mb-4">
+            <div class="col-12">
+              <div class="card metric-card text-center">
+                <div class="card-body p-4 p-lg-5">
+                  <p class="text-uppercase small fw-bold muted-text mb-2">
+                    Overall ATS Score
+                  </p>
+                  <div class="score-display">{{ score }}%</div>
+                  <h3 class="h4 mt-3 mb-0">{{ category }}</h3>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="card metric-card h-100">
+                <div class="card-body p-4">
+                  <i class="bi bi-check2-circle text-brand fs-3"></i>
+                  <h3 class="h5 mt-3">Skill Match Score</h3>
+                  <p class="h3 fw-bold mb-0">{{ skill_score }}%</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="card metric-card h-100">
+                <div class="card-body p-4">
+                  <i class="bi bi-file-earmark-text text-brand fs-3"></i>
+                  <h3 class="h5 mt-3">Text Similarity Score</h3>
+                  <p class="h3 fw-bold mb-0">{{ text_similarity }}%</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="card metric-card h-100">
+                <div class="card-body p-4">
+                  <i class="bi bi-briefcase text-brand fs-3"></i>
+                  <h3 class="h5 mt-3">Experience Relevance Score</h3>
+                  <p class="h3 fw-bold mb-0">{{ experience_score }}%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-lg-6">
+              <div class="card metric-card h-100">
+                <div class="card-body p-4">
+                  <h3 class="h5 section-title">Matched Skills</h3>
+                  <ul class="list-group list-group-flush">
+                    {% for skill in matched %}
+                    <li class="list-group-item px-0">
+                      <i class="bi bi-check-circle-fill text-success me-2"></i>
+                      {{ skill }}
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="card metric-card h-100">
+                <div class="card-body p-4">
+                  <h3 class="h5 section-title">Missing Skills</h3>
+                  <ul class="list-group list-group-flush">
+                    {% for skill in missing %}
+                    <li class="list-group-item px-0">
+                      <i
+                        class="bi bi-exclamation-circle-fill text-warning me-2"
+                      ></i>
+                      {{ skill }}
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="card metric-card h-100">
+                <div class="card-body p-4">
+                  <h3 class="h5 section-title">
+                    Resume Improvement Suggestions
+                  </h3>
+                  <ul class="list-group list-group-flush">
+                    {% for suggestion in suggestions %}
+                    <li class="list-group-item px-0">
+                      <i class="bi bi-arrow-right-circle text-brand me-2"></i>
+                      {{ suggestion }}
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="card metric-card h-100">
+                <div class="card-body p-4">
+                  <h3 class="h5 section-title">Recommended Job Roles</h3>
+                  <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                      <thead>
+                        <tr>
+                          <th>Role</th>
+                          <th class="text-end">Match Score</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for job in recommended_jobs %}
+                        <tr>
+                          <td>{{ job.job }}</td>
+                          <td class="text-end fw-semibold">{{ job.score }}%</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center mt-4">
+            <p
+              class="category {% if category == 'Great Match' %}great {% elif category == 'Good Match' %}good {% elif category == 'Average Match' %}average {% else %}poor{% endif %}"
+            >
+              {{ category }}
+            </p>
+            <a class="btn btn-brand btn-lg mt-3" href="/download-report">
+              <i class="bi bi-download me-2"></i>
+              Download PDF Report
+            </a>
+          </div>
+        </div>
+      </section>
+      {% endif %}
+    </main>
+
+    <footer class="footer py-4 border-top bg-white">
+      <div class="container text-center">
+        <p class="mb-0">
+          ResumeIQ helps job seekers turn resume feedback into focused next
+          steps.
         </p>
-      </header>
+      </div>
+    </footer>
 
-      <main>
-        <section>
-          <h2>Evaluate Your Resume</h2>
-          <p class="subtitle">
-            Upload a PDF or DOCX resume, then paste the target job description.
-          </p>
-
-          <form action="/match" method="post" enctype="multipart/form-data">
-            <label class="label" for="resume">Resume File</label>
-            <input
-              id="resume"
-              type="file"
-              name="resume"
-              accept=".pdf,.docx"
-              required
-            />
-
-            <label class="label" for="job_description">
-              Target Job Description
-            </label>
-            <textarea
-              id="job_description"
-              name="job_description"
-              placeholder="Paste the full job description here..."
-              required
-            ></textarea>
-
-            <button type="submit">Analyze Resume</button>
-          </form>
-        </section>
-
-        {% if score %}
-        <section class="result">
-          <h2>Resume Match Report</h2>
-
-          <div class="score-card">
-            <h2>Overall ATS Score</h2>
-
-            <div class="score">{{ score }}%</div>
-
-            <h3>{{ category }}</h3>
-          </div>
-
-          <div class="card">
-            <h2>Skill Match Score</h2>
-
-            <p>{{ skill_score }}%</p>
-          </div>
-
-          <div class="card">
-            <h2>Text Similarity Score</h2>
-
-            <p>{{ text_similarity }}%</p>
-          </div>
-
-          <div class="card">
-            <h2>Experience Relevance Score</h2>
-
-            <p>{{ experience_score }}%</p>
-          </div>
-
-          <div class="card">
-            <h2>Matched Skills</h2>
-
-            <ul>
-              {% for skill in matched %}
-              <li>{{ skill }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-
-          <div class="card">
-            <h2>Missing Skills</h2>
-
-            <ul>
-              {% for skill in missing %}
-              <li>{{ skill }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-
-          <div class="card">
-            <h2>Resume Improvement Suggestions</h2>
-
-            <ul>
-              {% for suggestion in suggestions %}
-              <li>{{ suggestion }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-
-          <p
-            class="category {% if category == 'Great Match' %}great {% elif category == 'Good Match' %}good {% elif category == 'Average Match' %}average {% else %}poor{% endif %}"
-          >
-            {{ category }}
-          </p>
-
-          <div class="card">
-            <h2>Recommended Job Roles</h2>
-
-            <table>
-              <tr>
-                <th>Role</th>
-
-                <th>Match Score</th>
-              </tr>
-
-              {% for job in recommended_jobs %}
-
-              <tr>
-                <td>{{ job.job }}</td>
-
-                <td>{{ job.score }}%</td>
-              </tr>
-
-              {% endfor %}
-            </table>
-          </div>
-
-          <a href="/download-report">
-            <button>Download PDF Report</button>
-          </a>
-        </section>
-        {% endif %}
-      </main>
-
-      <footer>
-        <p>ATS Resume Evaluator helps turn resume feedback into focused next steps.</p>
-      </footer>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
   </body>
 </html>
