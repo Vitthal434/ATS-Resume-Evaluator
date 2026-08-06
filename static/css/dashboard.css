@@ -251,3 +251,26 @@
 
   color: #b91c1c;
 }
+.expert {
+  background: #059669;
+}
+
+.strong {
+  background: #2563eb;
+}
+
+.good {
+  background: #f59e0b;
+}
+
+.medium {
+  background: #fef3c7;
+
+  color: #b45309;
+}
+
+.low {
+  background: #dbeafe;
+
+  color: #1d4ed8;
+}
