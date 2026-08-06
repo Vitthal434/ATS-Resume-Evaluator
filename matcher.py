@@ -172,13 +172,13 @@ def final_match_score(resume, job):
         )
 
     if final_score > 85:
-        recommendation = "Excellent Match"
+        recommendation = "Excellent Fit"
     elif final_score > 70:
-        recommendation = "Good Match"
+        recommendation = "Good Fit"
     elif final_score > 50:
-        recommendation = "Average Match"
+        recommendation = "Fair Fit"
     else:
-        recommendation = "Low Match"
+        recommendation = "Needs Improvement"
 
     return {
         "ats_score": final_score,

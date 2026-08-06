@@ -106,28 +106,6 @@
         border-color: #1d4ed8;
         color: #ffffff;
       }
-
-      .metric-card {
-        border: 1px solid #e3e8f2;
-        border-radius: 16px;
-      }
-
-      .score-display {
-        color: #15803d;
-        font-size: clamp(3rem, 8vw, 5rem);
-        font-weight: 800;
-        line-height: 1;
-      }
-
-      .section-title {
-        color: #111827;
-        font-weight: 700;
-      }
-
-      .muted-text {
-        color: #64748b;
-      }
-
       .footer {
         color: #64748b;
       }
@@ -177,9 +155,7 @@
             <!-- Left Side -->
 
             <div class="col-lg-6">
-              <span class="hero-badge">
-                🚀 AI Powered Resume Intelligence
-              </span>
+              <span class="hero-badge"> AI Powered Resume Intelligence </span>
 
               <h1 class="hero-title mt-4">
                 Land More Interviews with
@@ -444,44 +420,216 @@
           </div>
 
           <div class="row g-4 mb-4">
-            <div class="col-12">
-              <div class="card metric-card text-center">
-                <div class="card-body p-4 p-lg-5">
-                  <p class="text-uppercase small fw-bold muted-text mb-2">
-                    Overall ATS Score
+            <div class="dashboard-summary">
+              <div class="row align-items-center">
+                <div class="col-lg-8">
+                  <p class="text-uppercase mb-2">Resume Health Overview</p>
+
+                  <div class="health-score">{{ score }}%</div>
+
+                  {% if category == "Excellent Fit" %}
+
+                  <span class="status-pill excellent">
+                    <i class="bi bi-patch-check-fill"></i>
+                    {{ category }}
+                  </span>
+
+                  <p class="mb-0">
+                    Excellent work! Your resume is highly optimized for this
+                    role. Only a few refinements may further improve it.
                   </p>
-                  <div class="score-display">{{ score }}%</div>
-                  <h3 class="h4 mt-3 mb-0">{{ category }}</h3>
+
+                  {% elif category == "Good Fit" %}
+
+                  <span class="status-pill good">
+                    <i class="bi bi-check-circle-fill"></i>
+                    {{ category }}
+                  </span>
+
+                  <p class="mb-0">
+                    Your resume aligns well with this job description. A few
+                    targeted improvements can increase your ATS score.
+                  </p>
+
+                  {% elif category == "Fair Fit" %}
+
+                  <span class="status-pill average">
+                    <i class="bi bi-info-circle-fill"></i>
+                    {{ category }}
+                  </span>
+
+                  <p class="mb-0">
+                    Your resume meets some requirements but is missing important
+                    skills. Focus on the roadmap below to strengthen your
+                    profile.
+                  </p>
+
+                  {% else %}
+
+                  <span class="status-pill improve">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    {{ category }}
+                  </span>
+
+                  <p class="mb-0">
+                    Your resume needs improvement before applying for this role.
+                    Follow the roadmap below to increase your ATS compatibility.
+                  </p>
+
+                  {% endif %}
+                </div>
+
+                <div class="col-lg-4 text-center">
+                  <i
+                    class="bi bi-shield-check"
+                    style="font-size: 6rem; opacity: 0.25"
+                  ></i>
                 </div>
               </div>
             </div>
 
             <div class="col-md-4">
               <div class="card metric-card h-100">
-                <div class="card-body p-4">
-                  <i class="bi bi-check2-circle text-brand fs-3"></i>
-                  <h3 class="h5 mt-3">Skill Match Score</h3>
-                  <p class="h3 fw-bold mb-0">{{ skill_score }}%</p>
+                <div class="card-body">
+                  <div class="metric-icon metric-green">
+                    <i class="bi bi-check-circle"></i>
+                  </div>
+
+                  <h5>Skill Match</h5>
+
+                  <h2 class="fw-bold mt-3">
+                    {{ "%.0f"|format(skill_score) }}%
+                  </h2>
+
+                  {% if skill_score >= 90 %}
+
+                  <span class="badge bg-success"> Excellent </span>
+
+                  <p class="text-muted mt-3 mb-0">
+                    Your skills align extremely well.
+                  </p>
+
+                  {% elif skill_score >= 75 %}
+
+                  <span class="badge bg-primary"> Good </span>
+
+                  <p class="text-muted mt-3 mb-0">
+                    Strong alignment with this role.
+                  </p>
+
+                  {% elif skill_score >= 60 %}
+
+                  <span class="badge bg-warning text-dark"> Average </span>
+
+                  <p class="text-muted mt-3 mb-0">
+                    Some important skills are missing.
+                  </p>
+
+                  {% else %}
+
+                  <span class="badge bg-danger"> Needs Work </span>
+
+                  <p class="text-muted mt-3 mb-0">
+                    Consider improving your technical skills.
+                  </p>
+
+                  {% endif %}
                 </div>
               </div>
             </div>
 
             <div class="col-md-4">
               <div class="card metric-card h-100">
-                <div class="card-body p-4">
-                  <i class="bi bi-file-earmark-text text-brand fs-3"></i>
-                  <h3 class="h5 mt-3">Text Similarity Score</h3>
-                  <p class="h3 fw-bold mb-0">{{ text_similarity }}%</p>
+                <div class="card-body">
+                  <div class="metric-icon metric-blue">
+                    <i class="bi bi-file-earmark-text"></i>
+                  </div>
+
+                  <h5>Text Similarity</h5>
+
+                  <h2 class="fw-bold mt-3">
+                    {{ "%.0f"|format(text_similarity) }}%
+                  </h2>
+
+                  {% if text_similarity >= 90 %}
+
+                  <span class="badge bg-success"> Excellent </span>
+
+                  <p class="text-muted mt-3 mb-0">
+                    Resume closely matches the job description.
+                  </p>
+
+                  {% elif text_similarity >= 75 %}
+
+                  <span class="badge bg-primary"> Good </span>
+
+                  <p class="text-muted mt-3 mb-0">Strong textual alignment.</p>
+
+                  {% elif text_similarity >= 60 %}
+
+                  <span class="badge bg-warning text-dark"> Average </span>
+
+                  <p class="text-muted mt-3 mb-0">
+                    Some important keywords are missing.
+                  </p>
+
+                  {% else %}
+
+                  <span class="badge bg-danger"> Needs Work </span>
+
+                  <p class="text-muted mt-3 mb-0">
+                    Rewrite your resume summary and add relevant keywords.
+                  </p>
+
+                  {% endif %}
                 </div>
               </div>
             </div>
 
             <div class="col-md-4">
               <div class="card metric-card h-100">
-                <div class="card-body p-4">
-                  <i class="bi bi-briefcase text-brand fs-3"></i>
-                  <h3 class="h5 mt-3">Experience Relevance Score</h3>
-                  <p class="h3 fw-bold mb-0">{{ experience_score }}%</p>
+                <div class="card-body">
+                  <div class="metric-icon metric-orange">
+                    <i class="bi bi-briefcase"></i>
+                  </div>
+
+                  <h5>Experience Relevance</h5>
+
+                  <h2 class="fw-bold mt-3">
+                    {{ "%.0f"|format(experience_score) }}%
+                  </h2>
+
+                  {% if experience_score >= 90 %}
+
+                  <span class="badge bg-success"> Excellent </span>
+
+                  <p class="text-muted mt-3 mb-0">
+                    Highly relevant experience for this role.
+                  </p>
+
+                  {% elif experience_score >= 75 %}
+
+                  <span class="badge bg-primary"> Good </span>
+
+                  <p class="text-muted mt-3 mb-0">Relevant experience found.</p>
+
+                  {% elif experience_score >= 60 %}
+
+                  <span class="badge bg-warning text-dark"> Average </span>
+
+                  <p class="text-muted mt-3 mb-0">
+                    Add more project details and achievements.
+                  </p>
+
+                  {% else %}
+
+                  <span class="badge bg-danger"> Needs Work </span>
+
+                  <p class="text-muted mt-3 mb-0">
+                    Highlight practical experience and projects.
+                  </p>
+
+                  {% endif %}
                 </div>
               </div>
             </div>
@@ -489,35 +637,58 @@
 
           <div class="row g-4">
             <div class="col-lg-6">
-              <div class="card metric-card h-100">
-                <div class="card-body p-4">
-                  <h3 class="h5 section-title">Matched Skills</h3>
-                  <ul class="list-group list-group-flush">
+              <div class="card dashboard-card h-100">
+                <div class="card-body">
+                  <h4 class="section-title">⭐ Your Strengths</h4>
+
+                  <p class="text-muted mb-4">
+                    Skills already matching this job description.
+                  </p>
+
+                  <div class="strength-container">
                     {% for skill in matched %}
-                    <li class="list-group-item px-0">
-                      <i class="bi bi-check-circle-fill text-success me-2"></i>
-                      {{ skill }}
-                    </li>
+
+                    <div class="strength-chip">
+                      <span>{{ skill | format_skill }}</span>
+
+                      <span class="strength-level"> Strong Match </span>
+                    </div>
+
                     {% endfor %}
-                  </ul>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div class="col-lg-6">
-              <div class="card metric-card h-100">
-                <div class="card-body p-4">
-                  <h3 class="h5 section-title">Missing Skills</h3>
-                  <ul class="list-group list-group-flush">
-                    {% for skill in missing %}
-                    <li class="list-group-item px-0">
-                      <i
-                        class="bi bi-exclamation-circle-fill text-warning me-2"
-                      ></i>
-                      {{ skill }}
-                    </li>
-                    {% endfor %}
-                  </ul>
+              <div class="card dashboard-card mt-4">
+                <div class="card-body">
+                  <h4 class="section-title">🚀 Resume Roadmap</h4>
+
+                  <p class="text-muted mb-4">
+                    Prioritized improvements to strengthen your resume.
+                  </p>
+
+                  {% for skill in missing %}
+
+                  <div class="roadmap-item">
+                    <div class="roadmap-left">
+                      <div class="roadmap-step">{{ loop.index }}</div>
+                    </div>
+
+                    <div class="roadmap-content">
+                      <h5>{{ skill | format_skill }}</h5>
+
+                      <span class="impact high"> High Impact </span>
+
+                      <p>
+                        This skill appears in the job description but is missing
+                        from your resume.
+                      </p>
+                    </div>
+                  </div>
+
+                  {% endfor %}
                 </div>
               </div>
             </div>

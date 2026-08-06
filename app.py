@@ -8,6 +8,32 @@ from report_generator import generate_report
 
 app = Flask(__name__)
 
+def format_skill(skill):
+    mapping = {
+        "aws": "AWS",
+        "api": "API",
+        "rest api": "REST API",
+        "html": "HTML",
+        "css": "CSS",
+        "sql": "SQL",
+        "mysql": "MySQL",
+        "postgresql": "PostgreSQL",
+        "github": "GitHub",
+        "git": "Git",
+        "oop": "OOP",
+        "dsa": "DSA",
+        "nlp": "NLP",
+        "ai": "AI",
+        "ml": "ML",
+        "c++": "C++",
+        "power bi": "Power BI",
+        "javascript": "JavaScript",
+        "typescript": "TypeScript",
+    }
+
+    return mapping.get(skill.lower(), skill.title())
+
+app.jinja_env.filters["format_skill"] = format_skill
 
 @app.route("/")
 def index():
