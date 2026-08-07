@@ -322,3 +322,30 @@
 
   flex-wrap: wrap;
 }
+.breakdown-item{
+
+  margin-bottom:28px;
+  
+  }
+  
+  .progress{
+  
+  height:10px;
+  
+  border-radius:20px;
+  
+  background:#E5E7EB;
+  
+  margin-top:8px;
+  
+  overflow:hidden;
+  
+  }
+  
+  .progress-bar{
+  
+  border-radius:20px;
+  
+  transition:width .8s ease;
+  
+  }
