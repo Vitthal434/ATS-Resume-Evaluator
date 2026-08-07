@@ -36,7 +36,7 @@
 
             {% elif category == "Good Fit" %}
 
-            <span class="status-pill good">
+            <span class="status-pill status-good">
               <i class="bi bi-check-circle-fill"></i>
               {{ category }}
             </span>
@@ -282,7 +282,7 @@
                 <span>{{ skill | format_skill }}</span>
 
                 <span
-                  class="strength-level {% if loop.index <= 3 %} expert {% elif loop.index <= 6 %} strong {% else %} good {% endif %}"
+                  class="strength-level {% if loop.index <= 3 %} expert {% elif loop.index <= 6 %} strong {% else %} strength-good {% endif %}"
                 >
                   {% if loop.index <= 3 %} Expert Match {% elif loop.index <= 6
                   %} Strong Match {% else %} Good Match {% endif %}
@@ -384,11 +384,6 @@
     </div>
 
     <div class="text-center mt-4">
-      <p
-        class="category {% if category == 'Great Fit' %}great {% elif category == 'Good Fit' %}good {% elif category == 'Fair Fit' %}average {% else %}Needs Improvement{% endif %}"
-      >
-        {{ category }}
-      </p>
       <a class="btn btn-brand btn-lg mt-3" href="/download-report">
         <i class="bi bi-download me-2"></i>
         Download PDF Report
