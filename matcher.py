@@ -131,19 +131,47 @@ def calculate_skill_match(resume, job):
 
     matched_skills = sorted(resume_skills & job_skills)
     missing_skills = sorted(job_skills - resume_skills)
-    skill_score = round((len(matched_skills) / len(job_skills)) * 100, 2)
+    coverage = len(matched_skills) / len(job_skills)
+
+    # Slightly reward resumes that already have good coverage
+    skill_score = round((coverage**0.6) * 100, 2)
 
     return skill_score, matched_skills, missing_skills
 
 
 def experience_score(resume):
-    """Estimate experience score from years of experience mentioned in resume."""
-    years = re.findall(r"(\d+)\s*\+?\s*years?", resume.lower())
+    """
+    Estimate experience score for both professionals and students.
+    """
 
-    if not years:
-        return 50
+    resume = resume.lower()
 
-    return min(int(years[0]) * 10, 100)
+    years = re.findall(r"(\d+)\s*\+?\s*years?", resume)
+
+    if years:
+        years_of_exp = int(years[0])
+
+    return min(70 + years_of_exp * 6, 100)
+
+    student_keywords = [
+        "intern",
+        "internship",
+        "project",
+        "projects",
+        "hackathon",
+        "freelance",
+        "freelancer",
+        "open source",
+        "research",
+        "training",
+        "certification",
+    ]
+
+    for keyword in student_keywords:
+        if keyword in resume:
+            return 70
+
+    return 50
 
 
 def final_match_score(resume, job):
@@ -152,24 +180,19 @@ def final_match_score(resume, job):
     skill_score, matched_skills, missing_skills = calculate_skill_match(resume, job)
     exp_score = experience_score(resume)
     final_score = round(
-        (SKILL_WEIGHT * skill_score) +
-        (TEXT_WEIGHT * text_score) +
-        (EXPERIENCE_WEIGHT * exp_score),
+        (SKILL_WEIGHT * skill_score)
+        + (TEXT_WEIGHT * text_score)
+        + (EXPERIENCE_WEIGHT * exp_score),
         2,
     )
 
     suggestions = []
 
     if missing_skills:
-        suggestions.append(
-            "Consider adding these skills: " +
-            ", ".join(missing_skills)
-        )
+        suggestions.append("Consider adding these skills: " + ", ".join(missing_skills))
 
     if exp_score < 60:
-        suggestions.append(
-            "Highlight internships, projects or practical experience."
-        )
+        suggestions.append("Highlight internships, projects or practical experience.")
 
     if final_score > 85:
         recommendation = "Excellent Fit"
