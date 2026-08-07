@@ -1,4 +1,4 @@
-{% if score %}
+{% extends "base.html" %} {% block content %} {% if score %}
 <section class="py-5" id="report">
   <div class="container">
     <div class="text-center mb-5">
@@ -393,7 +393,11 @@
         <i class="bi bi-download me-2"></i>
         Download PDF Report
       </a>
+      <a href="/analyze" class="btn btn-outline-primary ms-2">
+        <i class="bi bi-arrow-repeat"></i>
+        Analyze Another Resume
+      </a>
     </div>
   </div>
 </section>
-{% endif %}
+{% endif %} {% endblock %}

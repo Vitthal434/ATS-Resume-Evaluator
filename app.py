@@ -43,6 +43,11 @@ def landing():
     return render_template("landing.html")
 
 
+@app.route("/analyze")
+def analyze():
+    return render_template("analyze.html")
+
+
 @app.route("/match", methods=["POST"])
 def match():
     resume = request.files["resume"]
@@ -82,7 +87,7 @@ def match():
     )
 
     return render_template(
-        "index.html",
+        "dashboard.html",
         score=result["ats_score"],
         category=result["recommendation"],
         matched=matched_skills,

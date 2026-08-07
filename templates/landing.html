@@ -1,9 +1,182 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block content %}
 
-{% block content %}
+<!-- ================= HERO SECTION ================= -->
 
-{% include "components/hero.html" %}
+<section class="hero">
+  <div class="container">
+    <div class="row align-items-center gy-5">
+      <!-- Left Side -->
 
-{% include "components/features.html" %}
+      <div class="col-lg-6">
+        <span class="hero-badge"> AI Powered Resume Intelligence </span>
+
+        <h1 class="hero-title mt-4">
+          Land More Interviews with
+          <span class="gradient-text">ResumeIQ</span>
+        </h1>
+
+        <p class="hero-description">
+          ResumeIQ analyzes your resume against job descriptions, identifies
+          missing skills, calculates ATS compatibility, and provides actionable
+          recommendations to maximize your chances of getting shortlisted.
+        </p>
+
+        <div class="hero-buttons">
+          <a href="/analyze" class="btn btn-primary btn-lg hero-btn">
+            <i class="bi bi-stars me-2"></i>
+
+            Analyze Resume
+          </a>
+
+          <a href="#features" class="btn btn-light btn-lg hero-btn-secondary">
+            Learn More
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Side -->
+
+      <div class="col-lg-6">
+        <div class="preview-card">
+          <div class="preview-header">
+            ResumeIQ Analysis
+
+            <span class="live-badge"> Live Demo </span>
+          </div>
+
+          <div class="preview-score">91%</div>
+
+          <div class="progress mb-4">
+            <div class="progress-bar bg-success" style="width: 91%"></div>
+          </div>
+
+          <p class="preview-text">Excellent ATS Compatibility</p>
+
+          <hr />
+
+          <div class="preview-skills">
+            <span>Python</span>
+
+            <span>Flask</span>
+
+            <span>Git</span>
+
+            <span>Docker</span>
+
+            <span>REST API</span>
+
+            <span>AWS</span>
+
+            <span>MySQL</span>
+
+            <span>Problem Solving</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--=================================
+ResumeIQ Trust Section
+===================================-->
+
+<section class="trust-section">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-3">
+        <div class="trust-card">
+          <h2>95%</h2>
+
+          <p>Average ATS Match Improvement</p>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="trust-card">
+          <h2>PDF</h2>
+
+          <p>Supports PDF & DOCX Resumes</p>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="trust-card">
+          <h2><10s</h2>
+
+          <p>Typical Resume Analysis Time</p>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="trust-card">
+          <h2>AI</h2>
+
+          <p>Smart Skill Gap Detection</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="py-5">
+  <div class="container">
+    <div class="row text-center mb-5">
+      <h2 class="fw-bold">Everything you need to optimize your resume</h2>
+
+      <p class="text-muted">AI-powered insights to help you stand out.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-3">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <i class="bi bi-graph-up-arrow fs-1 text-primary"></i>
+
+            <h5 class="mt-3">ATS Analysis</h5>
+
+            <p>Measure resume compatibility with modern ATS systems.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <i class="bi bi-stars fs-1 text-primary"></i>
+
+            <h5 class="mt-3">Skill Matching</h5>
+
+            <p>Identify strengths and missing skills instantly.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <i class="bi bi-file-earmark-pdf fs-1 text-primary"></i>
+
+            <h5 class="mt-3">PDF Reports</h5>
+
+            <p>Generate downloadable ATS analysis reports.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <i class="bi bi-briefcase fs-1 text-primary"></i>
+
+            <h5 class="mt-3">Job Suggestions</h5>
+
+            <p>Discover relevant job roles based on your resume.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 {% endblock %}
