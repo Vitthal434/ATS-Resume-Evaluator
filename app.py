@@ -39,8 +39,8 @@ app.jinja_env.filters["format_skill"] = format_skill
 
 
 @app.route("/")
-def index():
-    return render_template("index.html")
+def landing():
+    return render_template("landing.html")
 
 
 @app.route("/match", methods=["POST"])
