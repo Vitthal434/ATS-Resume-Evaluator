@@ -20,91 +20,18 @@
     />
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
+      href="{{ url_for('static', filename='css/base.css') }}"
+    />
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/landing.css') }}"
     />
 
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/dashboard.css') }}"
     />
-    <style>
-      body {
-        font-family: "Poppins", sans-serif;
-        background: #f6f8fb;
-      }
-
-      .navbar-brand span,
-      .text-brand {
-        color: #2563eb;
-      }
-
-      .hero-section {
-        padding: 96px 0 64px;
-      }
-
-      .hero-badge {
-        background: #eaf1ff;
-        color: #1d4ed8;
-      }
-
-      .hero-title {
-        color: #111827;
-        font-size: clamp(2.4rem, 5vw, 4.75rem);
-        font-weight: 800;
-        letter-spacing: 0;
-        line-height: 1.05;
-      }
-
-      .hero-copy {
-        color: #5b6475;
-        font-size: 1.08rem;
-      }
-
-      .app-card {
-        border: 1px solid #e3e8f2;
-        border-radius: 18px;
-        box-shadow: 0 18px 48px rgba(15, 23, 42, 0.1);
-      }
-
-      .form-control,
-      .form-label {
-        font-size: 0.95rem;
-      }
-
-      .form-control {
-        border-color: #d8e0ec;
-        border-radius: 12px;
-        padding: 0.85rem 1rem;
-      }
-
-      .form-control:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.12);
-      }
-
-      textarea.form-control {
-        min-height: 220px;
-      }
-
-      .btn-brand {
-        background: #2563eb;
-        border-color: #2563eb;
-        border-radius: 12px;
-        color: #ffffff;
-        font-weight: 700;
-        padding: 0.9rem 1.25rem;
-      }
-
-      .btn-brand:hover,
-      .btn-brand:focus {
-        background: #1d4ed8;
-        border-color: #1d4ed8;
-        color: #ffffff;
-      }
-      .footer {
-        color: #64748b;
-      }
-    </style>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
