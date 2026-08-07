@@ -8,6 +8,7 @@ from report_generator import generate_report
 
 app = Flask(__name__)
 
+
 def format_skill(skill):
     mapping = {
         "aws": "AWS",
@@ -33,7 +34,9 @@ def format_skill(skill):
 
     return mapping.get(skill.lower(), skill.title())
 
+
 app.jinja_env.filters["format_skill"] = format_skill
+
 
 @app.route("/")
 def index():
@@ -57,7 +60,13 @@ def match():
 
     # Generate the ATS result, job recommendations, and downloadable report.
     result = final_match_score(resume_text, job_desc)
+
     matched_skills = result["matched_skills"]
+
+    top_recommendation = (
+        result["missing_skills"][0] if result["missing_skills"] else None
+    )
+
     recommended_jobs = recommend_jobs(matched_skills)
 
     pdf_path = generate_report(
@@ -84,6 +93,7 @@ def match():
         experience_score=result["experience_score"],
         recommended_jobs=recommended_jobs,
         pdf_path=pdf_path,
+        top_recommendation=top_recommendation,
     )
 
 

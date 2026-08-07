@@ -635,6 +635,50 @@
             </div>
           </div>
 
+          {% if top_recommendation %}
+
+          <div class="card top-recommendation-card my-4">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <span class="top-tag"> 🎯 TOP RECOMMENDATION </span>
+
+                  <h3 class="mt-3">
+                    Add
+                    <span class="highlight-skill">
+                      {{ top_recommendation | format_skill }}
+                    </span>
+
+                    to your resume
+                  </h3>
+
+                  <p class="mt-3">
+                    This skill is present in the job description but missing
+                    from your resume. Adding it can significantly improve your
+                    ATS compatibility.
+                  </p>
+
+                  <div class="recommendation-info">
+                    <span>
+                      📈 Estimated ATS Gain
+                      <strong>+8%</strong>
+                    </span>
+
+                    <span> ⏱ 15–20 Minutes </span>
+                  </div>
+
+                  <a href="#resume-roadmap" class="btn btn-primary mt-4">
+                    View Improvement Roadmap
+                  </a>
+                </div>
+
+                <div class="idea-icon">💡</div>
+              </div>
+            </div>
+          </div>
+
+          {% endif %}
+
           <div class="row g-4">
             <div class="col-lg-6">
               <div class="card dashboard-card h-100">
@@ -666,7 +710,7 @@
             </div>
 
             <div class="col-lg-6">
-              <div class="card dashboard-card mt-4">
+              <div class="card dashboard-card mt-4" id="resume-roadmap">
                 <div class="card-body">
                   <h4 class="section-title">🚀 Resume Roadmap</h4>
 
