@@ -7,111 +7,332 @@ SKILL_WEIGHT = 0.50
 TEXT_WEIGHT = 0.30
 EXPERIENCE_WEIGHT = 0.20
 
-SKILL_CATEGORIES = {
-    "programming_languages": {
-        "python",
-        "java",
-        "c",
-        "c++",
-        "javascript",
-        "typescript",
-        "go",
+SKILL_DATABASE = {
+    # ===========================
+    # Programming Languages
+    # ===========================
+    "python": {
+        "display": "Python",
+        "category": "programming_languages",
+        "aliases": ["py"],
+        "group": None,
     },
-    "frontend": {
-        "html",
-        "css",
-        "bootstrap",
-        "tailwind",
-        "react",
-        "angular",
-        "vue",
+    "java": {
+        "display": "Java",
+        "category": "programming_languages",
+        "aliases": [],
+        "group": None,
     },
-    "backend": {
-        "flask",
-        "django",
-        "fastapi",
-        "node.js",
-        "express",
-        "rest api",
-        "grpc",
+    "c": {
+        "display": "C",
+        "category": "programming_languages",
+        "aliases": [],
+        "group": None,
     },
-    "databases": {
-        "sql",
-        "mysql",
-        "postgresql",
-        "mongodb",
-        "sqlite",
-        "redis",
-        "dynamodb",
-        "pinecone",
-        "qdrant",
-        "chromadb",
+    "c++": {
+        "display": "C++",
+        "category": "programming_languages",
+        "aliases": ["cpp"],
+        "group": None,
     },
-    "ai_ml": {
-        "machine learning",
-        "deep learning",
-        "data science",
-        "artificial intelligence",
-        "nlp",
-        "computer vision",
-        "transformers",
-        "bert",
-        "llama",
-        "mistral",
-        "rag",
-        "prompt engineering",
-        "natural language processing",
+    "javascript": {
+        "display": "JavaScript",
+        "category": "programming_languages",
+        "aliases": ["js"],
+        "group": None,
     },
-    "python_libraries": {
-        "numpy",
-        "pandas",
-        "matplotlib",
-        "seaborn",
-        "scikit-learn",
-        "tensorflow",
-        "keras",
-        "pytorch",
+    "typescript": {
+        "display": "TypeScript",
+        "category": "programming_languages",
+        "aliases": ["ts"],
+        "group": None,
     },
-    "data_analytics": {
-        "power bi",
-        "tableau",
-        "excel",
+    "go": {
+        "display": "Go",
+        "category": "programming_languages",
+        "aliases": ["golang"],
+        "group": None,
     },
-    "cloud_devops": {
-        "aws",
-        "gcp",
-        "azure",
-        "docker",
-        "kubernetes",
-        "redis",
-        "terraform",
-        "cloudformation",
-        "mlflow",
-        "kubeflow",
-        "triton inference server",
+    # ===========================
+    # Frontend
+    # ===========================
+    "html": {
+        "display": "HTML",
+        "category": "frontend",
+        "aliases": [],
+        "group": None,
     },
-    "version_control": {
-        "git",
-        "github",
+    "css": {
+        "display": "CSS",
+        "category": "frontend",
+        "aliases": [],
+        "group": None,
     },
-    "operating_systems": {
-        "linux",
+    "bootstrap": {
+        "display": "Bootstrap",
+        "category": "frontend",
+        "aliases": [],
+        "group": None,
     },
-    "soft_skills": {
-        "communication",
-        "leadership",
-        "problem solving",
-        "teamwork",
-        "critical thinking",
+    "tailwind": {
+        "display": "Tailwind CSS",
+        "category": "frontend",
+        "aliases": ["tailwindcss"],
+        "group": None,
     },
-    "other": {
-        "oop",
-        "dsa",
+    "react": {
+        "display": "React",
+        "category": "frontend",
+        "aliases": ["react.js", "reactjs"],
+        "group": None,
+    },
+    "angular": {
+        "display": "Angular",
+        "category": "frontend",
+        "aliases": [],
+        "group": None,
+    },
+    "vue": {
+        "display": "Vue.js",
+        "category": "frontend",
+        "aliases": ["vuejs"],
+        "group": None,
+    },
+    # ===========================
+    # Backend
+    # ===========================
+    "flask": {
+        "display": "Flask",
+        "category": "backend",
+        "aliases": [],
+        "group": "python_framework",
+    },
+    "django": {
+        "display": "Django",
+        "category": "backend",
+        "aliases": [],
+        "group": "python_framework",
+    },
+    "fastapi": {
+        "display": "FastAPI",
+        "category": "backend",
+        "aliases": [],
+        "group": "python_framework",
+    },
+    "node.js": {
+        "display": "Node.js",
+        "category": "backend",
+        "aliases": ["node", "nodejs"],
+        "group": "backend_runtime",
+    },
+    "express": {
+        "display": "Express.js",
+        "category": "backend",
+        "aliases": ["expressjs"],
+        "group": "backend_framework",
+    },
+    "rest api": {
+        "display": "REST API",
+        "category": "backend",
+        "aliases": [
+            "api",
+            "apis",
+            "rest api",
+            "rest apis",
+            "restful api",
+        ],
+        "group": "api_style",
+    },
+    "graphql": {
+        "display": "GraphQL",
+        "category": "backend",
+        "aliases": ["graphql api"],
+        "group": "api_style",
+    },
+    "grpc": {
+        "display": "gRPC",
+        "category": "backend",
+        "aliases": [],
+        "group": "api_style",
+    },
+    # ===========================
+    # Databases
+    # ===========================
+    "sql": {
+        "display": "SQL",
+        "category": "database",
+        "aliases": [],
+        "group": "database_type",
+    },
+    "mysql": {
+        "display": "MySQL",
+        "category": "database",
+        "aliases": [],
+        "group": "relational_database",
+    },
+    "postgresql": {
+        "display": "PostgreSQL",
+        "category": "database",
+        "aliases": ["postgres"],
+        "group": "relational_database",
+    },
+    "sqlite": {
+        "display": "SQLite",
+        "category": "database",
+        "aliases": [],
+        "group": "relational_database",
+    },
+    "mongodb": {
+        "display": "MongoDB",
+        "category": "database",
+        "aliases": ["mongo"],
+        "group": "nosql_database",
+    },
+    "dynamodb": {
+        "display": "DynamoDB",
+        "category": "database",
+        "aliases": [],
+        "group": "nosql_database",
+    },
+    "redis": {
+        "display": "Redis",
+        "category": "database",
+        "aliases": [],
+        "group": "cache_database",
+    },
+    "pinecone": {
+        "display": "Pinecone",
+        "category": "database",
+        "aliases": [],
+        "group": "vector_database",
+    },
+    "qdrant": {
+        "display": "Qdrant",
+        "category": "database",
+        "aliases": [],
+        "group": "vector_database",
+    },
+    "chromadb": {
+        "display": "ChromaDB",
+        "category": "database",
+        "aliases": ["chroma"],
+        "group": "vector_database",
+    },
+    # ===========================
+    # Cloud / DevOps
+    # ===========================
+    "aws": {
+        "display": "AWS",
+        "category": "cloud_devops",
+        "aliases": ["amazon web services"],
+        "group": "cloud_provider",
+    },
+    "gcp": {
+        "display": "GCP",
+        "category": "cloud_devops",
+        "aliases": ["google cloud", "google cloud platform"],
+        "group": "cloud_provider",
+    },
+    "azure": {
+        "display": "Microsoft Azure",
+        "category": "cloud_devops",
+        "aliases": ["azure cloud"],
+        "group": "cloud_provider",
+    },
+    "docker": {
+        "display": "Docker",
+        "category": "cloud_devops",
+        "aliases": [],
+        "group": "containerization",
+    },
+    "kubernetes": {
+        "display": "Kubernetes",
+        "category": "cloud_devops",
+        "aliases": ["k8s"],
+        "group": "container_orchestration",
+    },
+    "terraform": {
+        "display": "Terraform",
+        "category": "cloud_devops",
+        "aliases": [],
+        "group": "infrastructure_as_code",
+    },
+    "cloudformation": {
+        "display": "CloudFormation",
+        "category": "cloud_devops",
+        "aliases": [],
+        "group": "infrastructure_as_code",
+    },
+    # ===========================
+    # Messaging
+    # ===========================
+    "kafka": {
+        "display": "Apache Kafka",
+        "category": "messaging",
+        "aliases": [],
+        "group": "message_queue",
+    },
+    "rabbitmq": {
+        "display": "RabbitMQ",
+        "category": "messaging",
+        "aliases": [],
+        "group": "message_queue",
+    },
+    # ===========================
+    # Authentication
+    # ===========================
+    "oauth2": {
+        "display": "OAuth2",
+        "category": "security",
+        "aliases": ["oauth"],
+        "group": "authentication",
+    },
+    "jwt": {
+        "display": "JWT",
+        "category": "security",
+        "aliases": ["json web token"],
+        "group": "authentication",
+    },
+    # ===========================
+    # AI / ML
+    # ===========================
+    "machine learning": {
+        "display": "Machine Learning",
+        "category": "ai_ml",
+        "aliases": ["ml"],
+        "group": None,
+    },
+    "deep learning": {
+        "display": "Deep Learning",
+        "category": "ai_ml",
+        "aliases": [],
+        "group": None,
+    },
+    "artificial intelligence": {
+        "display": "Artificial Intelligence",
+        "category": "ai_ml",
+        "aliases": ["ai"],
+        "group": None,
+    },
+    "natural language processing": {
+        "display": "Natural Language Processing",
+        "category": "ai_ml",
+        "aliases": ["nlp"],
+        "group": None,
+    },
+    "computer vision": {
+        "display": "Computer Vision",
+        "category": "ai_ml",
+        "aliases": ["cv"],
+        "group": None,
+    },
+    "rag": {
+        "display": "Retrieval-Augmented Generation",
+        "category": "ai_ml",
+        "aliases": ["retrieval augmented generation"],
+        "group": None,
     },
 }
-
-SKILLS = set().union(*SKILL_CATEGORIES.values())
-
 
 def preprocess(text):
     """Normalize text for keyword and skill matching."""
@@ -119,61 +340,90 @@ def preprocess(text):
     text = re.sub(r"[^a-zA-Z0-9+# ]", " ", text)
     return text
 
-SKILL_ALIASES = {
-    "machine learning": ["ml"],
-    "artificial intelligence": ["ai"],
-    "javascript": ["js"],
-    "typescript": ["ts"],
-    "node.js": ["node", "nodejs", "node.js"],
-    "rest api": [
-        "api",
-        "apis",
-        "rest api",
-        "rest apis",
-        "restful api",
-    ],
-    "computer vision": ["cv"],
-    "object oriented programming": ["oop"],
-    "data structures and algorithms": ["dsa"],
-    "database management system": ["dbms"],
-    "data analysis": ["data analytics", "data analysis"],
-    "power bi": ["powerbi"],
-    "postgresql": ["postgres"],
-    "mongodb": ["mongo"],
-    "artificial intelligence": ["ai"],
-    "natural language processing": ["nlp"],
-    "retrieval augmented generation": ["rag"],
-    "graphql": ["graphql api"],
-    "natural language processing": ["nlp"],
-}
+
+REQUIRED_HEADERS = [
+    "required skills",
+    "required qualifications",
+    "minimum qualifications",
+    "requirements",
+    "qualifications",
+    "must have",
+]
+
+OPTIONAL_HEADERS = [
+    "preferred",
+    "preferred qualifications",
+    "nice to have",
+    "bonus",
+    "good to have",
+]
 
 
 def extract_skills(text):
     """
-    Extract skills using whole-word matching and aliases.
+    Extract skills using the unified SKILL_DATABASE.
     """
 
     normalized_text = preprocess(text)
     found_skills = set()
 
-    # Match canonical skill names
-    for skill in SKILLS:
-        pattern = r"\b" + re.escape(skill) + r"\b"
+    for canonical_skill, metadata in SKILL_DATABASE.items():
+
+        # Match canonical skill
+        pattern = r"\b" + re.escape(canonical_skill) + r"\b"
 
         if re.search(pattern, normalized_text):
-            found_skills.add(skill)
+            found_skills.add(canonical_skill)
+            continue
 
-    # Match aliases
-    for canonical_skill, aliases in SKILL_ALIASES.items():
-
-        for alias in aliases:
+        # Match aliases
+        for alias in metadata["aliases"]:
 
             pattern = r"\b" + re.escape(alias) + r"\b"
 
             if re.search(pattern, normalized_text):
                 found_skills.add(canonical_skill)
+                break
 
     return found_skills
+
+
+def parse_job_description(job_text):
+
+    text = preprocess(job_text)
+
+    required_text = text
+    optional_text = ""
+
+    # Find optional section
+    optional_index = len(text)
+
+    for header in OPTIONAL_HEADERS:
+        index = text.find(header)
+        if index != -1:
+            optional_index = min(optional_index, index)
+
+    # Find required section
+    required_found = False
+
+    for header in REQUIRED_HEADERS:
+        index = text.find(header)
+        if index != -1:
+            required_found = True
+            required_text = text[index:optional_index]
+            break
+
+    if optional_index < len(text):
+        optional_text = text[optional_index:]
+
+    # Fallback:
+    if not required_found:
+        required_text = text
+
+    return {
+        "required": extract_skills(required_text),
+        "optional": extract_skills(optional_text),
+    }
 
 
 def calculate_text_similarity(resume, job):
@@ -189,7 +439,12 @@ def calculate_text_similarity(resume, job):
 def calculate_skill_match(resume, job):
     """Compare extracted resume skills against extracted job skills."""
     resume_skills = extract_skills(resume)
-    job_skills = extract_skills(job)
+    job_data = parse_job_description(job)
+
+    required_skills = job_data["required"]
+    optional_skills = job_data["optional"]
+
+    job_skills = required_skills | optional_skills
 
     if not job_skills:
         return 0, [], []
