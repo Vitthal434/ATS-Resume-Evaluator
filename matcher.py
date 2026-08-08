@@ -141,36 +141,56 @@ def calculate_skill_match(resume, job):
 
 def experience_score(resume):
     """
-    Estimate experience score for both professionals and students.
+    Estimate experience score from resume text.
+
+    Supports:
+    - 5 years
+    - 5+ years
+    - 6 months
+    - 45 days
+    - internships
+    - projects
     """
 
     resume = resume.lower()
 
-    years = re.findall(r"(\d+)\s*\+?\s*years?", resume)
+    # -------- Years --------
+    year_match = re.search(r"(\d+)\s*\+?\s*years?", resume)
+    if year_match:
+        years = int(year_match.group(1))
+        return min(70 + years * 6, 100)
 
-    if years:
-        years_of_exp = int(years[0])
+    # -------- Months --------
+    month_match = re.search(r"(\d+)\s*months?", resume)
+    if month_match:
+        months = int(month_match.group(1))
+        years = months / 12
+        return min(65 + years * 6, 80)
 
-    return min(70 + years_of_exp * 6, 100)
+    # -------- Days --------
+    day_match = re.search(r"(\d+)\s*days?", resume)
+    if day_match:
+        days = int(day_match.group(1))
+        years = days / 365
+        return min(60 + years * 6, 70)
 
+    # -------- Student Experience --------
     student_keywords = [
         "intern",
         "internship",
         "project",
         "projects",
-        "hackathon",
         "freelance",
-        "freelancer",
-        "open source",
         "research",
         "training",
+        "hackathon",
         "certification",
     ]
 
-    for keyword in student_keywords:
-        if keyword in resume:
-            return 70
+    if any(keyword in resume for keyword in student_keywords):
+        return 65
 
+    # -------- No Experience --------
     return 50
 
 
