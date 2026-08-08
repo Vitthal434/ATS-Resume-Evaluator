@@ -15,6 +15,7 @@ SKILL_CATEGORIES = {
         "c++",
         "javascript",
         "typescript",
+        "go",
     },
     "frontend": {
         "html",
@@ -29,10 +30,10 @@ SKILL_CATEGORIES = {
         "flask",
         "django",
         "fastapi",
-        "node",
+        "node.js",
         "express",
-        "api",
         "rest api",
+        "grpc",
     },
     "databases": {
         "sql",
@@ -40,6 +41,11 @@ SKILL_CATEGORIES = {
         "postgresql",
         "mongodb",
         "sqlite",
+        "redis",
+        "dynamodb",
+        "pinecone",
+        "qdrant",
+        "chromadb",
     },
     "ai_ml": {
         "machine learning",
@@ -48,6 +54,13 @@ SKILL_CATEGORIES = {
         "artificial intelligence",
         "nlp",
         "computer vision",
+        "transformers",
+        "bert",
+        "llama",
+        "mistral",
+        "rag",
+        "prompt engineering",
+        "natural language processing",
     },
     "python_libraries": {
         "numpy",
@@ -66,8 +79,16 @@ SKILL_CATEGORIES = {
     },
     "cloud_devops": {
         "aws",
+        "gcp",
+        "azure",
         "docker",
         "kubernetes",
+        "redis",
+        "terraform",
+        "cloudformation",
+        "mlflow",
+        "kubeflow",
+        "triton inference server",
     },
     "version_control": {
         "git",
@@ -98,15 +119,59 @@ def preprocess(text):
     text = re.sub(r"[^a-zA-Z0-9+# ]", " ", text)
     return text
 
+SKILL_ALIASES = {
+    "machine learning": ["ml"],
+    "artificial intelligence": ["ai"],
+    "javascript": ["js"],
+    "typescript": ["ts"],
+    "node.js": ["node", "nodejs", "node.js"],
+    "rest api": [
+        "api",
+        "apis",
+        "rest api",
+        "rest apis",
+        "restful api",
+    ],
+    "computer vision": ["cv"],
+    "object oriented programming": ["oop"],
+    "data structures and algorithms": ["dsa"],
+    "database management system": ["dbms"],
+    "data analysis": ["data analytics", "data analysis"],
+    "power bi": ["powerbi"],
+    "postgresql": ["postgres"],
+    "mongodb": ["mongo"],
+    "artificial intelligence": ["ai"],
+    "natural language processing": ["nlp"],
+    "retrieval augmented generation": ["rag"],
+    "graphql": ["graphql api"],
+    "natural language processing": ["nlp"],
+}
+
 
 def extract_skills(text):
-    """Return skills from the database that appear in the provided text."""
+    """
+    Extract skills using whole-word matching and aliases.
+    """
+
     normalized_text = preprocess(text)
     found_skills = set()
 
+    # Match canonical skill names
     for skill in SKILLS:
-        if skill in normalized_text:
+        pattern = r"\b" + re.escape(skill) + r"\b"
+
+        if re.search(pattern, normalized_text):
             found_skills.add(skill)
+
+    # Match aliases
+    for canonical_skill, aliases in SKILL_ALIASES.items():
+
+        for alias in aliases:
+
+            pattern = r"\b" + re.escape(alias) + r"\b"
+
+            if re.search(pattern, normalized_text):
+                found_skills.add(canonical_skill)
 
     return found_skills
 
