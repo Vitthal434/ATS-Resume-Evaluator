@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 from flask import send_file
 
-from resume_parser import read_pdf, read_docx, clean_text
+from resume_parser import read_pdf, read_docx
 from matcher import final_match_score
 from job_recommender import recommend_jobs
 from report_generator import generate_report
@@ -60,8 +60,18 @@ def match():
         resume_text = read_docx(resume)
 
     # Normalize resume and job description text before matching.
-    resume_text = clean_text(resume_text)
-    job_desc = clean_text(job_desc)
+    # Extract text from the uploaded resume.
+    if resume.filename.endswith(".pdf"):
+        resume_text = read_pdf(resume)
+    else:
+        resume_text = read_docx(resume)
+
+    # Pass raw text to the matcher.
+    # matcher.py performs its own normalization while preserving
+    # punctuation and structural keywords such as "or".
+
+    # Generate the ATS result, job recommendations, and downloadable report.
+    result = final_match_score(resume_text, job_desc)
 
     # Generate the ATS result, job recommendations, and downloadable report.
     result = final_match_score(resume_text, job_desc)
