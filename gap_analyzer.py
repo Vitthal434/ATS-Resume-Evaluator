@@ -84,11 +84,11 @@ def analyze_resume_job_gap(resume_text: str, job_text: str) -> Dict[str, Any]:
             missing_skills.append({
                 "skill": group_label,
                 "category": "required",
-                "priority": "CRITICAL"
+                "priority": "HIGH"
             })
             recommendations.append({
                 "skill": group_label,
-                "priority": "CRITICAL",
+                "priority": "HIGH",
                 "reason": f"Required skill ({group_label}) is completely missing."
             })
 
@@ -122,11 +122,11 @@ def analyze_resume_job_gap(resume_text: str, job_text: str) -> Dict[str, Any]:
             missing_skills.append({
                 "skill": skill,
                 "category": "required",
-                "priority": "CRITICAL"
+                "priority": "HIGH"
             })
             recommendations.append({
                 "skill": skill,
-                "priority": "CRITICAL",
+                "priority": "HIGH",
                 "reason": f"Required skill ({skill}) is completely missing."
             })
 
@@ -270,6 +270,93 @@ def analyze_resume_job_gap(resume_text: str, job_text: str) -> Dict[str, Any]:
     effective_matches = num_exact + (num_partial * PARTIAL_MATCH_FACTOR)
     coverage_pct = round((effective_matches / total_reqs * 100), 1) if total_reqs > 0 else 0.0
 
+    # ============================================================
+    # STAGE 9.5: DETERMINISTIC GAP PRIORITIZATION & ROADMAP
+    # ============================================================
+    all_gaps = []
+
+    # Process missing skills into gaps
+    for m in missing_skills:
+        cat = m.get("category", "general")
+        prio = m.get("priority", "HIGH")
+        if cat == "required":
+            impact = "high"
+            reason = "Required skill currently missing"
+            rec = f"Add truthful project or work experience demonstrating {m['skill']} if you have used it."
+        elif cat == "general":
+            impact = "medium"
+            reason = "General role skill currently missing"
+            rec = f"Consider adding verifiable experience or coursework for {m['skill']}."
+        else:
+            impact = "low"
+            reason = "Optional / preferred skill missing"
+            rec = f"Nice-to-have skill: mention {m['skill']} if applicable to differentiate your application."
+
+        all_gaps.append({
+            "skill": m["skill"],
+            "status": "missing",
+            "category": cat,
+            "priority": prio,
+            "estimated_impact": impact,
+            "impact_reason": reason,
+            "recommendation": rec,
+        })
+
+    # Process partial matches into gaps
+    for p in partial_matches:
+        cat = p.get("category", "general")
+        req_skill = p["required_skill"]
+        cand_skill = p["candidate_skill"]
+        if cat == "required":
+            prio = "HIGH"
+            impact = "medium"
+            reason = f"Required skill partially matched via related skill {cand_skill}"
+            rec = f"Strengthen evidence for {cand_skill} usage to demonstrate explicit {req_skill} proficiency."
+        elif cat == "general":
+            prio = "MEDIUM"
+            impact = "low"
+            reason = f"General skill partially matched via {cand_skill}"
+            rec = f"Highlight {cand_skill} projects to demonstrate transferable {req_skill} competence."
+        else:
+            prio = "LOW"
+            impact = "low"
+            reason = f"Optional skill partially matched via {cand_skill}"
+            rec = f"Nice-to-have skill partially covered by {cand_skill}."
+
+        all_gaps.append({
+            "skill": req_skill,
+            "status": "partial",
+            "candidate_skill": cand_skill,
+            "category": cat,
+            "priority": prio,
+            "estimated_impact": impact,
+            "impact_reason": reason,
+            "recommendation": rec,
+        })
+
+    # Priority sorting helper
+    prio_order = {"HIGH": 1, "MEDIUM": 2, "LOW": 3}
+    cat_order = {"required": 1, "general": 2, "optional": 3}
+    status_order = {"missing": 1, "partial": 2}
+
+    def _gap_sort_key(gap):
+        return (
+            prio_order.get(gap["priority"], 3),
+            cat_order.get(gap["category"], 3),
+            status_order.get(gap["status"], 3),
+            gap["skill"].lower()
+        )
+
+    # Sort gaps deterministically
+    prioritized_gaps = sorted(all_gaps, key=_gap_sort_key)
+
+    # Build deterministic roadmap
+    roadmap = {
+        "immediate": [g for g in prioritized_gaps if g["priority"] == "HIGH"],
+        "next": [g for g in prioritized_gaps if g["priority"] == "MEDIUM"],
+        "optional": [g for g in prioritized_gaps if g["priority"] == "LOW"],
+    }
+
     return {
         "skill_coverage": {
             "exact_matches": num_exact,
@@ -282,6 +369,8 @@ def analyze_resume_job_gap(resume_text: str, job_text: str) -> Dict[str, Any]:
         "partial_matches": partial_matches,
         "missing_skills": missing_skills,
         "recommendations": recommendations,
+        "prioritized_gaps": prioritized_gaps,
+        "roadmap": roadmap,
         "ai_roadmap": None,
     }
 

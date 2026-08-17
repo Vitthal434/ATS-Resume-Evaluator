@@ -69,15 +69,15 @@ class TestGapAnalysis(unittest.TestCase):
         self.assertEqual(res["skill_coverage"]["missing"], 1)
         self.assertEqual(res["missing_skills"][0]["skill"], "python")
 
-    def test_06_required_missing_skill_gets_critical_priority(self):
-        """Missing required skill gets CRITICAL priority."""
+    def test_06_required_missing_skill_gets_high_priority(self):
+        """Missing required skill gets HIGH priority."""
         resume = "Skills: HTML, CSS"
         jd = "Required Skills:\n- Docker"
         res = analyze_resume_job_gap(resume, jd)
 
         missing_item = res["missing_skills"][0]
         self.assertEqual(missing_item["skill"], "docker")
-        self.assertEqual(missing_item["priority"], "CRITICAL")
+        self.assertEqual(missing_item["priority"], "HIGH")
 
     def test_07_optional_missing_skill_gets_lower_priority(self):
         """Missing optional skill gets lower priority (MEDIUM)."""

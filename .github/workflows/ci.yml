@@ -74,6 +74,11 @@ jobs:
           SECRET_KEY: ci-test-secret
         run: python tests/test_gap_analysis.py
 
+      - name: Run Gap Prioritization & Improvement Roadmap Unit Tests
+        env:
+          SECRET_KEY: ci-test-secret
+        run: python tests/test_gap_prioritization.py
+
   docker-build:
     name: Build Docker Container Image
     needs: test

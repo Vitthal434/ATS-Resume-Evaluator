@@ -185,5 +185,27 @@ def api_gap_analysis():
     return jsonify({"success": True, "analysis": gap_res}), 200
 
 
+@app.route("/api/ai/improvement-roadmap", methods=["POST"])
+def ai_improvement_roadmap():
+    if not is_gemini_available():
+        return jsonify({"error": "Gemini AI is not configured"}), 503
+
+    data = request.get_json(silent=True) or request.form
+    resume_text = data.get("resume_text", "").strip()
+    job_description = data.get("job_description", "").strip()
+
+    if not resume_text or not job_description:
+        return jsonify({"error": "Missing required fields: resume_text and job_description."}), 400
+
+    gap_res = analyze_resume_job_gap(resume_text, job_description)
+    gap_res = enhance_gap_analysis_with_ai(gap_res, job_description)
+
+    return jsonify({
+        "success": True,
+        "roadmap": gap_res.get("roadmap"),
+        "ai_roadmap": gap_res.get("ai_roadmap")
+    }), 200
+
+
 if __name__ == "__main__":
     app.run(debug=True)
