@@ -2,13 +2,17 @@
 ResumeIQ — AI Resume Bullet Optimizer
 Parses resume bullet points, enforces strict non-hallucination ATS prompts,
 and returns structured before-and-after improvements aligned with job description requirements.
+
+Uses the configured AI provider (ai.provider) — defaults to local open-source model.
+AI_PROVIDER=local (default) or AI_PROVIDER=gemini
 """
 
+import os
 import json
 import re
 from typing import List, Dict, Any
 
-from ai.gemini_provider import is_gemini_available, call_gemini_api
+from ai.provider import is_ai_available, call_ai
 
 
 SYSTEM_PROMPT = """
@@ -54,8 +58,8 @@ def extract_bullets(text: str) -> List[str]:
         if 25 <= len(cleaned) <= 300:
             bullets.append(cleaned)
 
-    # Return top 5 most relevant bullets to keep prompt focused and fast
-    return bullets[:5]
+    # Return top 3 most relevant bullets to keep prompt focused, fast, and within generation budget
+    return bullets[:3]
 
 
 def improve_resume_bullets(
@@ -66,11 +70,17 @@ def improve_resume_bullets(
     """
     Generate structured ATS bullet improvements for resume text against a job description.
     Returns dictionary with 'available', 'improvements', and 'error' status.
+
+    Uses the configured AI provider (local by default, optional Gemini).
+    Does not modify or influence deterministic ATS scoring in any way.
     """
-    if not is_gemini_available():
+    if not is_ai_available():
         return {
             "available": False,
-            "error": "AI service not configured (GEMINI_API_KEY environment variable is missing).",
+            "error": (
+                "AI service is not available. Install torch and transformers for local AI, "
+                "or set AI_PROVIDER=gemini with a valid GEMINI_API_KEY."
+            ),
             "improvements": []
         }
 
@@ -84,8 +94,7 @@ def improve_resume_bullets(
 
     missing_str = ", ".join(missing_skills) if missing_skills else "None identified"
 
-    user_prompt = f"""
-{SYSTEM_PROMPT}
+    user_prompt = f"""{SYSTEM_PROMPT}
 
 TARGET JOB DESCRIPTION:
 {job_description[:1500]}
@@ -101,7 +110,8 @@ RESUME BULLETS TO OPTIMIZE:
     user_prompt += "\nAnalyze these bullets and return the structured JSON improvements."
 
     try:
-        raw_response = call_gemini_api(user_prompt)
+        bullet_max_tokens = int(os.environ.get("AI_BULLET_MAX_TOKENS", "512"))
+        raw_response = call_ai(user_prompt, max_tokens=bullet_max_tokens)
 
         # Clean any markdown codeblock formatting if present
         clean_json = raw_response.strip()

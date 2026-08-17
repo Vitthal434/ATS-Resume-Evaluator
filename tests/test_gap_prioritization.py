@@ -146,11 +146,11 @@ class TestGapPrioritization(unittest.TestCase):
         expected = round(0.50 * result["skill_score"] + 0.30 * result["text_similarity"] + 0.20 * result["experience_score"], 2)
         self.assertAlmostEqual(result["ats_score"], expected, places=1)
 
-    @patch("app.is_gemini_available", return_value=True)
-    @patch("gap_analyzer.is_gemini_available", return_value=True)
-    @patch("gap_analyzer.call_gemini_api", return_value="- Step 1: Learn Docker\n- Step 2: Build containerized API")
-    def test_11_ai_improvement_roadmap_endpoint_success(self, mock_gemini_call, mock_gap_avail, mock_app_avail):
-        """POST /api/ai/improvement-roadmap returns structured roadmap and AI explanation when Gemini is available."""
+    @patch("app.is_ai_available", return_value=True)
+    @patch("gap_analyzer.is_ai_available", return_value=True)
+    @patch("gap_analyzer.call_ai", return_value="- Step 1: Learn Docker\n- Step 2: Build containerized API")
+    def test_11_ai_improvement_roadmap_endpoint_success(self, mock_ai_call, mock_gap_avail, mock_app_avail):
+        """POST /api/ai/improvement-roadmap returns structured roadmap and AI explanation when AI is available."""
         payload = {
             "resume_text": "Skills: Python",
             "job_description": "Required Skills:\n- Python\n- Docker"
@@ -164,10 +164,10 @@ class TestGapPrioritization(unittest.TestCase):
         self.assertIn("ai_roadmap", data)
         self.assertIsNotNone(data["ai_roadmap"])
 
-    @patch("app.is_gemini_available", return_value=False)
-    @patch("gap_analyzer.is_gemini_available", return_value=False)
+    @patch("app.is_ai_available", return_value=False)
+    @patch("gap_analyzer.is_ai_available", return_value=False)
     def test_12_ai_improvement_roadmap_missing_key(self, mock_gap_avail, mock_app_avail):
-        """POST /api/ai/improvement-roadmap returns HTTP 503 when GEMINI_API_KEY is unavailable."""
+        """POST /api/ai/improvement-roadmap returns HTTP 503 when AI is unavailable."""
         payload = {
             "resume_text": "Skills: Python",
             "job_description": "Required Skills:\n- Python\n- Docker"
@@ -175,11 +175,11 @@ class TestGapPrioritization(unittest.TestCase):
         response = self.app.post("/api/ai/improvement-roadmap", json=payload)
         self.assertEqual(response.status_code, 503)
 
-    @patch("app.is_gemini_available", return_value=True)
-    @patch("gap_analyzer.is_gemini_available", return_value=True)
-    @patch("gap_analyzer.call_gemini_api", side_effect=Exception("API Timeout"))
-    def test_13_ai_improvement_roadmap_provider_failure(self, mock_gemini_call, mock_gap_avail, mock_app_avail):
-        """Gemini API failure falls back safely returning deterministic roadmap without crashing."""
+    @patch("app.is_ai_available", return_value=True)
+    @patch("gap_analyzer.is_ai_available", return_value=True)
+    @patch("gap_analyzer.call_ai", side_effect=Exception("API Timeout"))
+    def test_13_ai_improvement_roadmap_provider_failure(self, mock_ai_call, mock_gap_avail, mock_app_avail):
+        """AI provider failure falls back safely returning deterministic roadmap without crashing."""
         payload = {
             "resume_text": "Skills: Python",
             "job_description": "Required Skills:\n- Python\n- Docker"

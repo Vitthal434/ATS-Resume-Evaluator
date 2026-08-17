@@ -1,68 +1,140 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
+
 <section id="analyze" class="upload-section py-5">
-  <div class="container">
-    <div class="text-center mb-5">
-      <span class="hero-badge"> Resume Analysis </span>
-
-      <h2 class="display-5 fw-bold mt-3">Ready to Analyze Your Resume?</h2>
-
+  <div class="container py-3">
+    <!-- Header -->
+    <div class="text-center max-w-700 mx-auto mb-5">
+      <span class="hero-badge mb-2">
+        <i class="bi bi-file-earmark-text text-primary"></i> Upload & Match
+      </span>
+      <h1 class="display-6 fw-bold mt-2">Ready to Analyze Your Resume?</h1>
       <p class="text-muted">
-        Upload your resume and paste the target job description to receive an
-        ATS compatibility report.
+        Upload your resume and paste your target job description. The deterministic engine will calculate your score, pinpoint missing requirements, and generate an actionable roadmap.
       </p>
     </div>
 
-    <form action="/match" method="POST" enctype="multipart/form-data">
-      <div class="row g-4">
+    <!-- Main Analysis Form -->
+    <form action="/match" method="POST" enctype="multipart/form-data" id="resume-analyze-form">
+      <div class="row g-4 align-items-stretch">
+        <!-- Left Column: Resume Upload Zone -->
         <div class="col-lg-5">
-          <label class="upload-box" for="resume">
-            <i class="bi bi-cloud-arrow-up-fill upload-icon"></i>
+          <div class="saas-card p-4 h-100 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <label class="form-label fw-bold mb-0">
+                <i class="bi bi-file-earmark-arrow-up text-primary me-1"></i> Step 1: Upload Resume
+              </label>
+              <span class="badge bg-light text-secondary border">PDF or DOCX</span>
+            </div>
 
-            <h4>Drop Resume Here</h4>
+            <!-- Full-Area Clickable Upload Drop Box -->
+            <label class="upload-box flex-grow-1" for="resume" id="upload-drop-zone">
+              <div class="upload-icon-wrapper">
+                <i class="bi bi-cloud-arrow-up-fill upload-icon"></i>
+              </div>
+              <h5 class="fw-bold mb-1">Drag & Drop Resume Here</h5>
+              <p class="text-muted small mb-3">or click anywhere in this box to browse</p>
+              <div class="d-flex gap-2">
+                <span class="badge bg-light text-dark border">.PDF</span>
+                <span class="badge bg-light text-dark border">.DOCX</span>
+                <span class="badge bg-light text-dark border">Max 16 MB</span>
+              </div>
+              <input
+                type="file"
+                id="resume"
+                name="resume"
+                accept=".pdf,.doc,.docx"
+                hidden
+                required
+              />
+            </label>
 
-            <p>or click to browse</p>
+            <!-- File Selected Status Card -->
+            <div id="file-info-card" class="p-3 bg-light border rounded mt-3 d-none align-items-center justify-content-between">
+              <div class="d-flex align-items-center gap-2 overflow-hidden">
+                <i class="bi bi-file-earmark-check-fill fs-4 text-success flex-shrink-0"></i>
+                <div class="overflow-hidden">
+                  <div id="selected-file-name" class="fw-bold text-truncate small">resume.pdf</div>
+                  <div id="selected-file-size" class="text-muted" style="font-size: 0.75rem;">124 KB</div>
+                </div>
+              </div>
+              <button type="button" id="remove-file" class="btn btn-sm btn-outline-danger flex-shrink-0 ms-2" title="Remove File">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
 
-            <small> PDF • DOCX </small>
-
-            <input
-              type="file"
-              id="resume"
-              name="resume"
-              accept=".pdf,.doc,.docx"
-              hidden
-              required
-            />
-          </label>
-
-          <div id="selected-file" class="selected-file">No file selected</div>
-
-          <button
-            type="button"
-            id="remove-file"
-            class="btn btn-sm btn-outline-danger mt-3"
-            style="display: none"
-          >
-            Remove File
-          </button>
+            <div class="mt-3 text-muted small">
+              <i class="bi bi-shield-lock text-success me-1"></i> Evaluated securely with local deterministic scoring.
+            </div>
+          </div>
         </div>
 
+        <!-- Right Column: Job Description Textarea -->
         <div class="col-lg-7">
-          <label class="form-label fw-semibold"> Job Description </label>
+          <div class="saas-card p-4 h-100 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <label class="form-label fw-bold mb-0">
+                <i class="bi bi-briefcase text-primary me-1"></i> Step 2: Target Job Description
+              </label>
+              <button type="button" id="btn-load-sample-jd" class="btn btn-sm btn-link text-decoration-none p-0">
+                <i class="bi bi-magic me-1"></i> Load Sample JD
+              </button>
+            </div>
 
-          <textarea
-            class="form-control"
-            name="job_description"
-            rows="10"
-            placeholder="Paste the complete job description here..."
-            required
-          ></textarea>
+            <textarea
+              class="form-control flex-grow-1 mb-3"
+              id="job_description"
+              name="job_description"
+              rows="12"
+              placeholder="Paste the target job description here... (Include Required Skills, Experience, and Responsibilities for the most accurate match)"
+              style="min-height: 240px; font-size: 0.92rem; line-height: 1.6;"
+              required
+            ></textarea>
 
-          <button class="btn hero-btn mt-4 w-100" type="submit">
-            Analyze Resume
-          </button>
+            <div class="d-flex justify-content-between align-items-center mb-3 text-muted small">
+              <span id="jd-word-count">0 words</span>
+              <span>Minimum 10 words recommended</span>
+            </div>
+
+            <!-- Submit Action -->
+            <button class="btn btn-brand btn-lg w-100 py-3" type="submit" id="btn-analyze-submit">
+              <i class="bi bi-stars me-2"></i> Calculate ATS Score & Generate Report
+            </button>
+          </div>
         </div>
       </div>
     </form>
+
+    <!-- Supporting Methodology Explanation -->
+    <div class="row g-4 mt-3">
+      <div class="col-md-4">
+        <div class="p-3 bg-white border rounded text-center h-100">
+          <div class="d-inline-flex p-2 bg-light text-primary rounded mb-2">
+            <i class="bi bi-diagram-3-fill fs-5"></i>
+          </div>
+          <h6 class="fw-bold mb-1">1. Skill Coverage (50%)</h6>
+          <p class="text-muted small mb-0">Matches detected skills and applies 50% partial credit for transferable domain capabilities.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 bg-white border rounded text-center h-100">
+          <div class="d-inline-flex p-2 bg-light text-success rounded mb-2">
+            <i class="bi bi-file-text-fill fs-5"></i>
+          </div>
+          <h6 class="fw-bold mb-1">2. Text Relevance (30%)</h6>
+          <p class="text-muted small mb-0">Evaluates semantic alignment with SentenceTransformers alongside lexical keyword density.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 bg-white border rounded text-center h-100">
+          <div class="d-inline-flex p-2 bg-light text-warning rounded mb-2">
+            <i class="bi bi-clock-history fs-5"></i>
+          </div>
+          <h6 class="fw-bold mb-1">3. Experience Level (20%)</h6>
+          <p class="text-muted small mb-0">Assesses declared tenure, seniority indicators, and relevant practical background.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 

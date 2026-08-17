@@ -11,7 +11,7 @@ from matcher import (
     _evaluate_requirement_match,
     PARTIAL_MATCH_FACTOR,
 )
-from ai.gemini_provider import is_gemini_available, call_gemini_api
+from ai.provider import is_ai_available, call_ai
 
 
 def analyze_resume_job_gap(resume_text: str, job_text: str) -> Dict[str, Any]:
@@ -380,7 +380,7 @@ def enhance_gap_analysis_with_ai(gap_analysis: Dict[str, Any], job_text: str) ->
     Optionally enrich deterministic gap analysis with a Gemini AI improvement roadmap.
     Fails safely if GEMINI_API_KEY is missing or API call fails.
     """
-    if not is_gemini_available():
+    if not is_ai_available():
         return gap_analysis
 
     recommendations = gap_analysis.get("recommendations", [])
@@ -411,7 +411,7 @@ Return a short, professional bulleted action plan.
 """
 
     try:
-        raw_response = call_gemini_api(prompt, timeout=12)
+        raw_response = call_ai(prompt, timeout=30)
         gap_analysis["ai_roadmap"] = raw_response.strip()
     except Exception as e:
         # Fallback cleanly without crashing

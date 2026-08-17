@@ -5,3 +5,8 @@ reportlab
 scikit-learn
 sentence-transformers
 waitress
+transformers>=4.40.0
+torch
+accelerate>=0.27.0
+huggingface-hub>=0.21.0
+llama-cpp-python>=0.3.0

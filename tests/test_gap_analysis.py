@@ -132,9 +132,9 @@ class TestGapAnalysis(unittest.TestCase):
         self.assertEqual(res["skill_coverage"]["exact_matches"], 0)
         self.assertEqual(res["skill_coverage"]["missing"], 2)
 
-    @patch("gap_analyzer.is_gemini_available", return_value=False)
-    def test_13_deterministic_analysis_works_without_gemini_key(self, mock_gemini):
-        """Deterministic gap analysis works 100% offline when GEMINI_API_KEY is unavailable."""
+    @patch("gap_analyzer.is_ai_available", return_value=False)
+    def test_13_deterministic_analysis_works_without_ai(self, mock_ai):
+        """Deterministic gap analysis works 100% offline when AI is unavailable."""
         resume = "Skills: Python"
         jd = "Required Skills:\n- Python\n- Docker"
         res = analyze_resume_job_gap(resume, jd)
@@ -143,10 +143,10 @@ class TestGapAnalysis(unittest.TestCase):
         self.assertIsNotNone(res_ai["skill_coverage"])
         self.assertIsNone(res_ai["ai_roadmap"])
 
-    @patch("gap_analyzer.is_gemini_available", return_value=True)
-    @patch("gap_analyzer.call_gemini_api", side_effect=Exception("API Network Timeout"))
-    def test_14_gemini_failure_does_not_destroy_deterministic_analysis(self, mock_call, mock_gemini):
-        """API failure in optional Gemini enhancement layer does not break deterministic gap analysis."""
+    @patch("gap_analyzer.is_ai_available", return_value=True)
+    @patch("gap_analyzer.call_ai", side_effect=Exception("API Network Timeout"))
+    def test_14_ai_failure_does_not_destroy_deterministic_analysis(self, mock_call, mock_ai):
+        """Failure in optional AI enhancement layer does not break deterministic gap analysis."""
         resume = "Skills: Python"
         jd = "Required Skills:\n- Python\n- Docker"
         res = analyze_resume_job_gap(resume, jd)

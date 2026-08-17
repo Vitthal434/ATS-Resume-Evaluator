@@ -7,7 +7,7 @@ from resume_parser import read_pdf, read_docx
 from matcher import final_match_score, get_semantic_model
 from job_recommender import recommend_jobs
 from report_generator import generate_report, format_skill
-from ai.gemini_provider import is_gemini_available
+from ai.provider import is_ai_available
 from ai.resume_improver import improve_resume_bullets
 from ai.jd_semantic_parser import parse_job_description
 from gap_analyzer import analyze_resume_job_gap, enhance_gap_analysis_with_ai
@@ -127,9 +127,9 @@ def health():
 
 @app.route("/api/ai/improve", methods=["POST"])
 def ai_improve():
-    if not is_gemini_available():
+    if not is_ai_available():
         return jsonify({
-            "error": "AI service not configured (GEMINI_API_KEY environment variable is missing).",
+            "error": "AI service is not available. No local model or API provider is configured.",
             "available": False
         }), 503
 
@@ -151,8 +151,8 @@ def ai_improve():
 
 @app.route("/api/ai/parse-jd", methods=["POST"])
 def ai_parse_jd():
-    if not is_gemini_available():
-        return jsonify({"error": "Gemini AI is not configured"}), 503
+    if not is_ai_available():
+        return jsonify({"error": "AI service is not available"}), 503
 
     data = request.get_json(silent=True) or request.form
     job_description = data.get("job_description", "").strip()
@@ -188,8 +188,8 @@ def api_gap_analysis():
 
 @app.route("/api/ai/improvement-roadmap", methods=["POST"])
 def ai_improvement_roadmap():
-    if not is_gemini_available():
-        return jsonify({"error": "Gemini AI is not configured"}), 503
+    if not is_ai_available():
+        return jsonify({"error": "AI service is not available"}), 503
 
     data = request.get_json(silent=True) or request.form
     resume_text = data.get("resume_text", "").strip()

@@ -1,693 +1,592 @@
-{% extends "base.html" %} {% block content %} {% if score %}
+{% extends "base.html" %}
+{% block content %}
+{% if score is defined and score is not none %}
+
 <section class="py-5" id="report">
-  <div class="container">
-    <div class="text-center mb-5">
-      <span class="badge rounded-pill hero-badge mb-3 px-3 py-2">
-        Resume Match Report
+  <div class="container py-2">
+    <!-- Header Title -->
+    <div class="text-center max-w-700 mx-auto mb-4">
+      <span class="hero-badge mb-2">
+        <i class="bi bi-patch-check text-primary"></i> Evaluation Complete
       </span>
-      <h2 class="section-title display-6 mb-3">
-        Your ResumeIQ analysis is ready.
-      </h2>
-      <p class="muted-text mb-0">
-        Review your ATS score, skill alignment, experience relevance, and
-        recommended roles.
+      <h1 class="display-6 fw-bold mt-2">ATS Resume Compatibility Report</h1>
+      <p class="text-muted">
+        Comprehensive deterministic analysis of your resume against the target job description.
       </p>
     </div>
 
-    <div class="row g-4 mb-4">
-      <div class="dashboard-summary">
-        <div class="row align-items-center">
-          <div class="col-lg-8">
-            <p class="text-uppercase mb-2">Resume Health Overview</p>
+    <!-- ================= 1. MAIN HERO SCORE CARD ================= -->
+    <div class="dashboard-hero-card mb-4">
+      <div class="row align-items-center gy-4">
+        <div class="col-lg-8">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="hero-score-badge-pill">
+              <i class="bi bi-shield-check"></i> Resume Health Overview
+            </span>
+            <span class="small text-white-50">Deterministic ATS Scoring</span>
+          </div>
 
-            <div class="health-score">{{ score }}%</div>
+          <div class="hero-score-number mb-2">{{ score }}%</div>
 
+          <div class="mb-3">
             {% if category == "Excellent Fit" %}
-
-            <span class="status-pill excellent">
-              <i class="bi bi-patch-check-fill"></i>
-              {{ category }}
+            <span class="hero-score-fit-pill fit-excellent">
+              <i class="bi bi-patch-check-fill"></i> {{ category }}
             </span>
-
-            <p class="mb-0">
-              Excellent work! Your resume is highly optimized for this role.
-              Only a few refinements may further improve it.
+            <p class="mt-2 mb-0 text-white-50">
+              Outstanding alignment! Your resume demonstrates strong coverage for the core technical requirements of this position.
             </p>
-
             {% elif category == "Good Fit" %}
-
-            <span class="status-pill status-good">
-              <i class="bi bi-check-circle-fill"></i>
-              {{ category }}
+            <span class="hero-score-fit-pill fit-good">
+              <i class="bi bi-check-circle-fill"></i> {{ category }}
             </span>
-
-            <p class="mb-0">
-              Your resume aligns well with this job description. A few targeted
-              improvements can increase your ATS score.
+            <p class="mt-2 mb-0 text-white-50">
+              Strong candidate profile. You meet the majority of requirements; closing the few missing skill gaps below will maximize your chances.
             </p>
-
             {% elif category == "Fair Fit" %}
-
-            <span class="status-pill average">
-              <i class="bi bi-info-circle-fill"></i>
-              {{ category }}
+            <span class="hero-score-fit-pill fit-fair">
+              <i class="bi bi-info-circle-fill"></i> {{ category }}
             </span>
-
-            <p class="mb-0">
-              Your resume meets some requirements but is missing important
-              skills. Focus on the roadmap below to strengthen your profile.
+            <p class="mt-2 mb-0 text-white-50">
+              Moderate alignment. You have foundational experience, but key required qualifications are currently missing.
             </p>
-
             {% else %}
-
-            <span class="status-pill improve">
-              <i class="bi bi-exclamation-triangle-fill"></i>
-              {{ category }}
+            <span class="hero-score-fit-pill fit-improve">
+              <i class="bi bi-exclamation-triangle-fill"></i> {{ category }}
             </span>
-
-            <p class="mb-0">
-              Your resume needs improvement before applying for this role.
-              Follow the roadmap below to increase your ATS compatibility.
+            <p class="mt-2 mb-0 text-white-50">
+              Significant gaps identified. We recommend following the improvement roadmap below before submitting your application.
             </p>
-
             {% endif %}
           </div>
 
-          <div class="col-lg-4 text-center">
-            <i
-              class="bi bi-shield-check"
-              style="font-size: 6rem; opacity: 0.25"
-            ></i>
+          <!-- Formula Components Bar -->
+          <div class="hero-formula-bar">
+            <div class="hero-formula-item">
+              <i class="bi bi-code-slash text-info"></i>
+              <span>Skill Match: <strong>{{ "%.1f"|format(skill_score) }}%</strong> (50% wt)</span>
+            </div>
+            <div class="hero-formula-item">
+              <i class="bi bi-file-earmark-text text-warning"></i>
+              <span>Text Similarity: <strong>{{ "%.1f"|format(text_similarity) }}%</strong> (30% wt)</span>
+            </div>
+            <div class="hero-formula-item">
+              <i class="bi bi-briefcase text-success"></i>
+              <span>Experience: <strong>{{ "%.1f"|format(experience_score) }}%</strong> (20% wt)</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="col-md-4">
-        <div class="card metric-card h-100">
-          <div class="card-body">
-            <div class="metric-icon metric-green">
-              <i class="bi bi-check-circle"></i>
-            </div>
-
-            <h5>Skill Match</h5>
-
-            <h2 class="fw-bold mt-3">{{ "%.0f"|format(skill_score) }}%</h2>
-
-            {% if skill_score >= 90 %}
-
-            <span class="badge bg-success"> Excellent </span>
-
-            <p class="text-muted mt-3 mb-0">
-              Your skills align extremely well.
-            </p>
-
-            {% elif skill_score >= 75 %}
-
-            <span class="badge bg-primary"> Good </span>
-
-            <p class="text-muted mt-3 mb-0">Strong alignment with this role.</p>
-
-            {% elif skill_score >= 60 %}
-
-            <span class="badge bg-warning text-dark"> Average </span>
-
-            <p class="text-muted mt-3 mb-0">
-              Some important skills are missing.
-            </p>
-
-            {% else %}
-
-            <span class="badge bg-danger"> Needs Work </span>
-
-            <p class="text-muted mt-3 mb-0">
-              Consider improving your technical skills.
-            </p>
-
-            {% endif %}
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="card metric-card h-100">
-          <div class="card-body">
-            <div class="metric-icon metric-blue">
-              <i class="bi bi-file-earmark-text"></i>
-            </div>
-
-            <h5>Text Similarity</h5>
-
-            <h2 class="fw-bold mt-3">{{ "%.0f"|format(text_similarity) }}%</h2>
-
-            {% if text_similarity >= 90 %}
-
-            <span class="badge bg-success"> Excellent </span>
-
-            <p class="text-muted mt-3 mb-0">
-              Resume closely matches the job description.
-            </p>
-
-            {% elif text_similarity >= 75 %}
-
-            <span class="badge bg-primary"> Good </span>
-
-            <p class="text-muted mt-3 mb-0">Strong textual alignment.</p>
-
-            {% elif text_similarity >= 60 %}
-
-            <span class="badge bg-warning text-dark"> Average </span>
-
-            <p class="text-muted mt-3 mb-0">
-              Some important keywords are missing.
-            </p>
-
-            {% else %}
-
-            <span class="badge bg-danger"> Needs Work </span>
-
-            <p class="text-muted mt-3 mb-0">
-              Rewrite your resume summary and add relevant keywords.
-            </p>
-
-            {% endif %}
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="card metric-card h-100">
-          <div class="card-body">
-            <div class="metric-icon metric-orange">
-              <i class="bi bi-briefcase"></i>
-            </div>
-
-            <h5>Experience Relevance</h5>
-
-            <h2 class="fw-bold mt-3">{{ "%.0f"|format(experience_score) }}%</h2>
-
-            {% if experience_score >= 90 %}
-
-            <span class="badge bg-success"> Excellent </span>
-
-            <p class="text-muted mt-3 mb-0">
-              Highly relevant experience for this role.
-            </p>
-
-            {% elif experience_score >= 75 %}
-
-            <span class="badge bg-primary"> Good </span>
-
-            <p class="text-muted mt-3 mb-0">Relevant experience found.</p>
-
-            {% elif experience_score >= 60 %}
-
-            <span class="badge bg-warning text-dark"> Average </span>
-
-            <p class="text-muted mt-3 mb-0">
-              Add more project details and achievements.
-            </p>
-
-            {% else %}
-
-            <span class="badge bg-danger"> Needs Work </span>
-
-            <p class="text-muted mt-3 mb-0">
-              Highlight practical experience and projects.
-            </p>
-
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    {% if top_recommendation %}
-
-    <div class="card top-recommendation-card my-4">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start">
-          <div>
-            <span class="top-tag"> 🎯 TOP RECOMMENDATION </span>
-
-            <h3 class="mt-3">
-              Add
-              <span class="highlight-skill">
-                {{ top_recommendation | format_skill }}
-              </span>
-
-              to your resume
-            </h3>
-
-            <p class="mt-3">
-              This skill is present in the job description but missing from your
-              resume. Adding it can significantly improve your ATS
-              compatibility.
-            </p>
-
-            <div class="recommendation-info">
-              <span> ⏱ 15–20 Minutes </span>
-            </div>
-
-            <a href="#resume-roadmap" class="btn btn-primary mt-4">
-              View Improvement Roadmap
+        <!-- Right Quick Actions -->
+        <div class="col-lg-4 text-lg-end text-start">
+          <div class="d-flex flex-column gap-2 justify-content-center">
+            <a href="/download-report" class="btn btn-light btn-lg fw-bold text-primary shadow-sm">
+              <i class="bi bi-file-earmark-pdf-fill me-2 text-danger"></i> Download PDF Report
+            </a>
+            <a href="#gap-analysis-section" class="btn btn-outline-light">
+              <i class="bi bi-signpost-split me-1"></i> View Improvement Roadmap
             </a>
           </div>
-
-          <div class="idea-icon">💡</div>
         </div>
       </div>
     </div>
 
-    {% endif %}
-
-    <div class="row g-4">
-      <div class="col-lg-6">
-        <div class="card dashboard-card h-100">
-          <div class="card-body">
-            <h4 class="section-title">⭐ Your Strengths</h4>
-
-            <p class="text-muted mb-4">
-              Skills already matching this job description.
-            </p>
-
-            <div class="strength-container">
-              {% for skill in matched %}
-
-              <div class="strength-chip">
-                <span>{{ skill | format_skill }}</span>
-
-                <span
-                  class="strength-level {% if loop.index <= 3 %} expert {% elif loop.index <= 6 %} strong {% else %} strength-good {% endif %}"
-                >
-                  {% if loop.index <= 3 %} Expert Match {% elif loop.index <= 6
-                  %} Strong Match {% else %} Good Match {% endif %}
-                </span>
-              </div>
-
-              {% endfor %}
+    <!-- ================= 2. THREE SUB-SCORE METRIC CARDS ================= -->
+    <div class="row g-4 mb-4">
+      <!-- Skill Match (50%) -->
+      <div class="col-md-4">
+        <div class="metric-card-saas">
+          <div class="metric-card-header">
+            <div>
+              <span class="text-uppercase small fw-bold text-muted d-block">50% Weight</span>
+              <h5 class="fw-bold mb-0">Skill Match</h5>
+            </div>
+            <div class="metric-icon-box metric-icon-blue">
+              <i class="bi bi-diagram-3-fill"></i>
             </div>
           </div>
+          <div class="metric-score-display text-primary">{{ "%.1f"|format(skill_score) }}%</div>
+          <div class="metric-progress-track">
+            <div class="metric-progress-bar bg-primary" style="width: {{ skill_score }}%;"></div>
+          </div>
+          <p class="text-muted small mb-0 mt-auto">
+            {% if skill_score >= 80 %}
+            Strong overlap with required and preferred technical competencies.
+            {% elif skill_score >= 50 %}
+            Partial skill coverage. Key framework or tool competencies missing.
+            {% else %}
+            Low skill overlap. Target qualifications require substantial additions.
+            {% endif %}
+          </p>
         </div>
       </div>
 
+      <!-- Text Similarity (30%) -->
+      <div class="col-md-4">
+        <div class="metric-card-saas">
+          <div class="metric-card-header">
+            <div>
+              <span class="text-uppercase small fw-bold text-muted d-block">30% Weight</span>
+              <h5 class="fw-bold mb-0">Text Similarity</h5>
+            </div>
+            <div class="metric-icon-box metric-icon-green">
+              <i class="bi bi-file-text-fill"></i>
+            </div>
+          </div>
+          <div class="metric-score-display text-success">{{ "%.1f"|format(text_similarity) }}%</div>
+          <div class="metric-progress-track">
+            <div class="metric-progress-bar bg-success" style="width: {{ text_similarity }}%;"></div>
+          </div>
+          <p class="text-muted small mb-0 mt-auto">
+            Hybrid SentenceTransformer semantic similarity + TF-IDF lexical overlap.
+          </p>
+        </div>
+      </div>
+
+      <!-- Experience Relevance (20%) -->
+      <div class="col-md-4">
+        <div class="metric-card-saas">
+          <div class="metric-card-header">
+            <div>
+              <span class="text-uppercase small fw-bold text-muted d-block">20% Weight</span>
+              <h5 class="fw-bold mb-0">Experience Relevance</h5>
+            </div>
+            <div class="metric-icon-box metric-icon-amber">
+              <i class="bi bi-clock-history"></i>
+            </div>
+          </div>
+          <div class="metric-score-display text-warning">{{ "%.1f"|format(experience_score) }}%</div>
+          <div class="metric-progress-track">
+            <div class="metric-progress-bar bg-warning" style="width: {{ experience_score }}%;"></div>
+          </div>
+          <p class="text-muted small mb-0 mt-auto">
+            Calculated from stated years of experience and domain seniority keywords.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 3. TOP RECOMMENDATION HIGHLIGHT ================= -->
+    {% if top_recommendation %}
+    <div class="top-rec-banner mb-4">
+      <div class="d-flex align-items-start gap-3">
+        <div class="navbar-brand-badge flex-shrink-0" style="background: var(--warning); width: 44px; height: 44px; font-size: 1.3rem;">
+          <i class="bi bi-lightbulb-fill"></i>
+        </div>
+        <div class="flex-grow-1">
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-warning text-dark fw-bold text-uppercase" style="font-size: 0.75rem;">Top Priority Action</span>
+            <span class="small text-muted">Estimated ATS Boost</span>
+          </div>
+          <h4 class="fw-bold text-dark mb-1">
+            Add truthful experience with <span class="text-primary">{{ top_recommendation | format_skill }}</span>
+          </h4>
+          <p class="text-muted small mb-2">
+            This requirement is explicitly demanded by the job description but not detected in your resume. Incorporating verifiable projects or usage will directly increase your ATS ranking.
+          </p>
+          <a href="#gap-analysis-section" class="btn btn-sm btn-brand">
+            <i class="bi bi-arrow-down-short"></i> View Full Roadmap Details
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ================= 4. SKILL BREAKDOWN (MATCHED & MISSING) ================= -->
+    <div class="row g-4 mb-4">
+      <!-- Strengths (Matched Skills) -->
       <div class="col-lg-6">
-        <div class="card dashboard-card mt-4" id="resume-roadmap">
-          <div class="card-body">
-            <h4 class="section-title">🚀 Resume Roadmap</h4>
+        <div class="saas-card p-4 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5 class="fw-bold mb-0">
+                <i class="bi bi-check2-circle text-success me-1"></i> Detected Strengths
+              </h5>
+              <span class="text-muted small">Skills matching this job description</span>
+            </div>
+            <span class="badge badge-success-subtle">{{ matched | length }} Matched</span>
+          </div>
 
-            <p class="text-muted mb-4">
-              Prioritized improvements to strengthen your resume.
-            </p>
+          {% if matched %}
+          <div class="strength-chip-grid">
+            {% for skill in matched %}
+            <span class="strength-chip-modern">
+              <i class="bi bi-check-lg text-success"></i>
+              {{ skill | format_skill }}
+            </span>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="p-3 bg-light rounded text-center text-muted small">
+            No direct skill matches detected in resume text.
+          </div>
+          {% endif %}
+        </div>
+      </div>
 
+      <!-- Missing Skills -->
+      <div class="col-lg-6">
+        <div class="saas-card p-4 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5 class="fw-bold mb-0">
+                <i class="bi bi-exclamation-triangle text-danger me-1"></i> Missing Requirements
+              </h5>
+              <span class="text-muted small">Qualifications present in JD but omitted</span>
+            </div>
+            <span class="badge badge-danger-subtle">{{ missing | length }} Missing</span>
+          </div>
+
+          {% if missing %}
+          <div class="strength-chip-grid">
             {% for skill in missing %}
-
-            <div class="roadmap-item">
-              <div class="roadmap-left">
-                <div class="roadmap-step">{{ loop.index }}</div>
-              </div>
-
-              <div class="roadmap-content">
-                <h5>{{ skill | format_skill }}</h5>
-
-                {% if loop.index == 1 %}
-
-                <span class="impact high"> High Impact </span>
-
-                {% elif loop.index <= 3 %}
-
-                <span class="impact medium"> Medium Impact </span>
-
-                {% else %}
-
-                <span class="impact low"> Low Impact </span>
-
-                {% endif %} {% if loop.index == 1 %}
-
-                <p>
-                  This is the highest priority improvement for this role and can
-                  significantly improve your ATS score.
-                </p>
-
-                {% elif loop.index <= 3 %}
-
-                <p>
-                  Adding this skill will strengthen your resume for similar job
-                  descriptions.
-                </p>
-
-                {% else %}
-
-                <p>
-                  A useful skill that can further improve your profile over
-                  time.
-                </p>
-
-                {% endif %}
-              </div>
-            </div>
-
+            <span class="missing-chip-modern">
+              <i class="bi bi-x-lg text-danger"></i>
+              {{ skill | format_skill }}
+            </span>
             {% endfor %}
           </div>
-        </div>
-      </div>
-
-      <div class="col-lg-6">
-        <div class="card metric-card h-100">
-          <div class="card-body p-4">
-            <h3 class="h5 section-title">Recommended Job Roles</h3>
-            <div class="table-responsive">
-              <table class="table align-middle mb-0">
-                <thead>
-                  <tr>
-                    <th>Role</th>
-                    <th class="text-end">Match Score</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for job in recommended_jobs %}
-                  <tr>
-                    <td>{{ job.job }}</td>
-                    <td class="text-end fw-semibold">{{ job.score }}%</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
+          {% else %}
+          <div class="p-3 bg-light rounded text-center text-success small fw-semibold">
+            <i class="bi bi-check-all me-1"></i> All detected skills are present in your resume!
           </div>
+          {% endif %}
         </div>
       </div>
     </div>
 
+    <!-- ================= 5. GAP ANALYSIS & ROADMAP ================= -->
     {% if gap_analysis %}
-    <!-- Resume-Job Gap Analysis Card -->
-    <div class="card dashboard-card mt-4" id="gap-analysis-section">
-      <div class="card-body p-4">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-          <div>
-            <h4 class="section-title mb-1">🎯 Resume–Job Gap Analysis</h4>
-            <p class="text-muted mb-0">Deterministic breakdown of exact matches, transferable skills, critical missing requirements, and recommended priorities.</p>
-          </div>
-          <span class="badge bg-primary fs-6 px-3 py-2">
-            Coverage: {{ gap_analysis.skill_coverage.coverage_percentage }}%
-          </span>
+    <div class="saas-card p-4 mb-4" id="gap-analysis-section">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+          <span class="badge badge-primary-subtle mb-1 text-uppercase">Gap Analysis Engine</span>
+          <h4 class="fw-bold mb-0">🎯 Resume–Job Gap Analysis</h4>
+          <p class="text-muted small mb-0">Deterministic breakdown of exact matches, transferable skills, and prioritized roadmap.</p>
         </div>
+        <span class="badge bg-primary fs-6 px-3 py-2">
+          Effective Coverage: {{ gap_analysis.skill_coverage.coverage_percentage }}%
+        </span>
+      </div>
 
-        <!-- Coverage Stats Pills -->
-        <div class="row g-3 text-center mb-4">
-          <div class="col-md-4">
-            <div class="p-3 bg-light border rounded">
-              <h3 class="fw-bold text-success mb-1">{{ gap_analysis.skill_coverage.exact_matches }}</h3>
-              <span class="badge bg-success">Exact Matches</span>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="p-3 bg-light border rounded">
-              <h3 class="fw-bold text-warning mb-1">{{ gap_analysis.skill_coverage.partial_matches }}</h3>
-              <span class="badge bg-warning text-dark">Partial / Transferable</span>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="p-3 bg-light border rounded">
-              <h3 class="fw-bold text-danger mb-1">{{ gap_analysis.skill_coverage.missing }}</h3>
-              <span class="badge bg-danger">Missing Requirements</span>
-            </div>
+      <!-- Coverage Stats Pills -->
+      <div class="row g-3 text-center mb-4">
+        <div class="col-4">
+          <div class="p-3 bg-light border rounded">
+            <div class="fs-4 fw-bold text-success">{{ gap_analysis.skill_coverage.exact_matches }}</div>
+            <span class="badge badge-success-subtle">Exact Matches</span>
           </div>
         </div>
+        <div class="col-4">
+          <div class="p-3 bg-light border rounded">
+            <div class="fs-4 fw-bold text-warning">{{ gap_analysis.skill_coverage.partial_matches }}</div>
+            <span class="badge badge-warning-subtle">Transferable (50%)</span>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="p-3 bg-light border rounded">
+            <div class="fs-4 fw-bold text-danger">{{ gap_analysis.skill_coverage.missing }}</div>
+            <span class="badge badge-danger-subtle">Missing</span>
+          </div>
+        </div>
+      </div>
 
-        <div class="row g-4">
-          <!-- Partial Matches -->
-          {% if gap_analysis.partial_matches %}
+      <!-- Transferable Skills (Partial Matches) -->
+      {% if gap_analysis.partial_matches %}
+      <div class="mb-4">
+        <h6 class="fw-bold text-dark mb-2">
+          <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Transferable Domain Skills (50% Partial Credit)
+        </h6>
+        <div class="row g-2">
+          {% for item in gap_analysis.partial_matches %}
           <div class="col-md-6">
-            <h6 class="fw-bold text-dark mb-2">⚡ Partial / Transferable Skills</h6>
-            <ul class="list-group list-group-flush border rounded">
-              {% for item in gap_analysis.partial_matches %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <strong class="text-capitalize">{{ item.required_skill }}</strong>
-                  <div class="small text-muted">Covered by {{ item.candidate_skill }} (50% credit)</div>
-                </div>
-                <span class="badge bg-warning text-dark">{{ item.priority }}</span>
-              </li>
-              {% endfor %}
-            </ul>
+            <div class="transferable-skill-card">
+              <div>
+                <div class="fw-bold text-capitalize">{{ item.required_skill }}</div>
+                <div class="small text-muted">Covered by related skill: <strong>{{ item.candidate_skill }}</strong></div>
+              </div>
+              <span class="badge bg-warning text-dark">{{ item.priority }}</span>
+            </div>
           </div>
-          {% endif %}
-
-          <!-- Critical Missing Skills -->
-          {% if gap_analysis.missing_skills %}
-          <div class="col-md-{% if gap_analysis.partial_matches %}6{% else %}12{% endif %}">
-            <h6 class="fw-bold text-dark mb-2">🚨 Missing Requirements & Priorities</h6>
-            <ul class="list-group list-group-flush border rounded">
-              {% for item in gap_analysis.missing_skills %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <strong class="text-capitalize">{{ item.skill }}</strong>
-                  <div class="small text-muted">{{ item.category | title }} requirement</div>
-                </div>
-                <span class="badge {% if item.priority == 'HIGH' %}bg-danger{% elif item.priority == 'MEDIUM' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
-                  {{ item.priority }}
-                </span>
-              </li>
-              {% endfor %}
-            </ul>
-          </div>
-          {% endif %}
+          {% endfor %}
         </div>
+      </div>
+      {% endif %}
 
-        <!-- Priority Recommendations -->
-        {% if gap_analysis.recommendations %}
-        <div class="mt-4">
-          <h6 class="fw-bold mb-2">💡 Recommended Priority Action Items</h6>
-          <div class="row g-2">
-            {% for rec in gap_analysis.recommendations %}
-            <div class="col-12">
-              <div class="p-2 border rounded bg-white d-flex align-items-center gap-2">
-                <span class="badge {% if rec.priority == 'HIGH' %}bg-danger{% elif rec.priority == 'MEDIUM' %}bg-warning text-dark{% else %}bg-secondary{% endif %} me-2">
-                  {{ rec.priority }}
-                </span>
-                <span class="small text-dark">{{ rec.reason }}</span>
+      <!-- Prioritized Improvement Roadmap -->
+      {% if gap_analysis.roadmap %}
+      <div class="pt-3 border-top">
+        <h5 class="fw-bold mb-3 text-dark">
+          <i class="bi bi-rocket-takeoff text-primary me-2"></i>🚀 Resume Improvement Roadmap
+        </h5>
+
+        <!-- Immediate Priorities (HIGH) -->
+        {% if gap_analysis.roadmap.immediate %}
+        <div class="mb-3">
+          <h6 class="fw-bold text-danger mb-2 small text-uppercase letter-spacing-1">
+            <i class="bi bi-exclamation-octagon-fill me-1"></i> Immediate Priorities (High Impact)
+          </h6>
+          {% for gap in gap_analysis.roadmap.immediate %}
+          <div class="roadmap-card-item border-start border-danger border-3">
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <strong class="text-capitalize fs-6">{{ gap.skill }}</strong>
+                <span class="badge badge-danger-subtle">Impact: {{ gap.estimated_impact | upper }}</span>
+                <span class="badge bg-secondary text-capitalize">{{ gap.category }}</span>
+              </div>
+              <div class="small text-muted mb-1">{{ gap.impact_reason }}</div>
+              <div class="small text-dark fw-semibold">
+                <i class="bi bi-check2-circle text-success me-1"></i> {{ gap.recommendation }}
               </div>
             </div>
-            {% endfor %}
+            <span class="badge bg-danger">{{ gap.status | upper }}</span>
           </div>
+          {% endfor %}
         </div>
         {% endif %}
 
-        <!-- Stage 9.5: Deterministic Resume Improvement Roadmap -->
-        {% if gap_analysis.roadmap %}
-        <div class="mt-4 pt-3 border-top">
-          <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-rocket-takeoff me-2"></i>🚀 Resume Improvement Roadmap</h5>
-
-          {% if gap_analysis.roadmap.immediate %}
-          <div class="mb-3">
-            <h6 class="fw-bold text-danger mb-2"><i class="bi bi-exclamation-triangle-fill me-1"></i> Immediate Priorities (High Impact)</h6>
-            <div class="list-group">
-              {% for gap in gap_analysis.roadmap.immediate %}
-              <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <div class="fw-bold text-capitalize">{{ gap.skill }} <span class="badge bg-light text-danger border ms-2">Impact: {{ gap.estimated_impact | upper }}</span></div>
-                  <div class="small text-muted mb-1">{{ gap.impact_reason }}</div>
-                  <div class="small text-dark"><i class="bi bi-check2-circle text-success me-1"></i> {{ gap.recommendation }}</div>
-                </div>
-                <span class="badge bg-danger">{{ gap.status | upper }}</span>
+        <!-- Next Priorities (MEDIUM) -->
+        {% if gap_analysis.roadmap.next %}
+        <div class="mb-3">
+          <h6 class="fw-bold text-warning mb-2 small text-uppercase letter-spacing-1">
+            <i class="bi bi-arrow-right-circle-fill me-1"></i> Next Priorities (Medium Impact)
+          </h6>
+          {% for gap in gap_analysis.roadmap.next %}
+          <div class="roadmap-card-item border-start border-warning border-3">
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <strong class="text-capitalize fs-6">{{ gap.skill }}</strong>
+                <span class="badge badge-warning-subtle">Impact: {{ gap.estimated_impact | upper }}</span>
+                <span class="badge bg-secondary text-capitalize">{{ gap.category }}</span>
               </div>
-              {% endfor %}
-            </div>
-          </div>
-          {% endif %}
-
-          {% if gap_analysis.roadmap.next %}
-          <div class="mb-3">
-            <h6 class="fw-bold text-warning mb-2"><i class="bi bi-arrow-right-circle-fill me-1"></i> Next Priorities (Medium Impact)</h6>
-            <div class="list-group">
-              {% for gap in gap_analysis.roadmap.next %}
-              <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <div class="fw-bold text-capitalize">{{ gap.skill }} <span class="badge bg-light text-warning border text-dark ms-2">Impact: {{ gap.estimated_impact | upper }}</span></div>
-                  <div class="small text-muted mb-1">{{ gap.impact_reason }}</div>
-                  <div class="small text-dark"><i class="bi bi-check2-circle text-primary me-1"></i> {{ gap.recommendation }}</div>
-                </div>
-                <span class="badge bg-warning text-dark">{{ gap.status | upper }}</span>
+              <div class="small text-muted mb-1">{{ gap.impact_reason }}</div>
+              <div class="small text-dark fw-semibold">
+                <i class="bi bi-check2-circle text-primary me-1"></i> {{ gap.recommendation }}
               </div>
-              {% endfor %}
             </div>
+            <span class="badge bg-warning text-dark">{{ gap.status | upper }}</span>
           </div>
-          {% endif %}
-
-          {% if gap_analysis.roadmap.optional %}
-          <div class="mb-3">
-            <h6 class="fw-bold text-secondary mb-2"><i class="bi bi-plus-circle-fill me-1"></i> Optional Enhancements (Low Impact)</h6>
-            <div class="list-group">
-              {% for gap in gap_analysis.roadmap.optional %}
-              <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <div class="fw-bold text-capitalize">{{ gap.skill }}</div>
-                  <div class="small text-muted mb-1">{{ gap.impact_reason }}</div>
-                  <div class="small text-dark"><i class="bi bi-info-circle me-1"></i> {{ gap.recommendation }}</div>
-                </div>
-                <span class="badge bg-secondary">{{ gap.status | upper }}</span>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-          {% endif %}
+          {% endfor %}
         </div>
         {% endif %}
+
+        <!-- Optional Enhancements (LOW) -->
+        {% if gap_analysis.roadmap.optional %}
+        <div class="mb-3">
+          <h6 class="fw-bold text-secondary mb-2 small text-uppercase letter-spacing-1">
+            <i class="bi bi-plus-circle-fill me-1"></i> Optional Enhancements (Low Impact)
+          </h6>
+          {% for gap in gap_analysis.roadmap.optional %}
+          <div class="roadmap-card-item border-start border-secondary border-3">
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <strong class="text-capitalize fs-6">{{ gap.skill }}</strong>
+                <span class="badge bg-light text-secondary border">Impact: {{ gap.estimated_impact | upper }}</span>
+              </div>
+              <div class="small text-muted mb-1">{{ gap.impact_reason }}</div>
+              <div class="small text-dark">
+                <i class="bi bi-info-circle me-1 text-secondary"></i> {{ gap.recommendation }}
+              </div>
+            </div>
+            <span class="badge bg-secondary">{{ gap.status | upper }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- ================= 6. RECOMMENDED JOBS ================= -->
+    {% if recommended_jobs %}
+    <div class="saas-card p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h5 class="fw-bold mb-0">
+            <i class="bi bi-briefcase-fill text-primary me-1"></i> Recommended Career Paths
+          </h5>
+          <span class="text-muted small">Deterministic ranking calculated from your matched resume skills</span>
+        </div>
+      </div>
+      <div class="row g-3">
+        {% for job in recommended_jobs %}
+        <div class="col-md-6 col-lg-3">
+          <div class="p-3 bg-light border rounded h-100 d-flex flex-column justify-content-between">
+            <div class="fw-bold text-dark mb-2">{{ job.job }}</div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="small text-muted">Skill Alignment:</span>
+              <span class="badge bg-primary">{{ job.score }}%</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
       </div>
     </div>
     {% endif %}
 
-    <div class="card dashboard-card mt-5" id="ai-improvement-section">
-      <div class="card-body p-4">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-          <div>
-            <h4 class="section-title mb-1">✨ AI Resume Bullet Optimization</h4>
-            <p class="text-muted mb-0">Optional LLM-driven bullet rewrites aligned with ATS requirements and missing skills.</p>
+    <!-- ================= 7. OPTIONAL AI CAPABILITIES ================= -->
+    <!-- AI Resume Bullet Optimization -->
+    <div class="saas-card p-4 mb-4" id="ai-improvement-section">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <h5 class="fw-bold mb-0">✨ AI Resume Bullet Optimization</h5>
+            <span class="badge badge-primary-subtle">Optional Feature</span>
           </div>
-          <button id="btn-ai-improve" class="btn btn-outline-primary">
-            <i class="bi bi-stars me-2"></i>Improve Bullets with AI
-          </button>
+          <p class="text-muted small mb-0">Optional LLM-driven bullet rewrites aligned with target keywords. (Does not modify deterministic ATS score).</p>
         </div>
+        <button id="btn-ai-improve" class="btn btn-brand-outline btn-sm">
+          <i class="bi bi-stars me-1"></i> Optimize Bullets
+        </button>
+      </div>
 
-        <div id="ai-loading-spinner" class="d-none text-center py-4">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Analyzing with AI...</span>
-          </div>
-          <p class="mt-2 text-muted">Optimizing resume bullet points with Gemini AI...</p>
+      <div id="ai-loading-spinner" class="d-none text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Analyzing with AI...</span>
         </div>
+        <p class="mt-2 text-muted small">Generating tailored bullet rewrites with Gemini AI...</p>
+      </div>
 
-        <div id="ai-error-alert" class="alert alert-warning d-none" role="alert">
-          <i class="bi bi-info-circle-fill me-2"></i><span id="ai-error-text"></span>
-        </div>
+      <div id="ai-error-alert" class="alert alert-info d-none" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i><span id="ai-error-text"></span>
+      </div>
 
-        <div id="ai-results-container" class="mt-3 d-none">
-          <!-- Dynamically populated AI improvement cards -->
-        </div>
+      <div id="ai-results-container" class="mt-3 d-none">
+        <!-- Dynamically populated AI improvement cards -->
       </div>
     </div>
 
-    <div class="card dashboard-card mt-4" id="ai-jd-parse-section">
-      <div class="card-body p-4">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-          <div>
-            <h4 class="section-title mb-1">🔍 AI Semantic JD Analysis</h4>
-            <p class="text-muted mb-0">Optional LLM extraction of required/preferred skills, alternative OR groups, and education requirements.</p>
+    <!-- AI Semantic JD Analysis -->
+    <div class="saas-card p-4 mb-4" id="ai-jd-parse-section">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <h5 class="fw-bold mb-0">🔍 AI Semantic JD Analysis</h5>
+            <span class="badge badge-info-subtle">Optional Feature</span>
           </div>
-          <button id="btn-ai-parse-jd" class="btn btn-outline-info">
-            <i class="bi bi-file-earmark-code me-2"></i>Parse JD Semantically
-          </button>
+          <p class="text-muted small mb-0">Optional extraction of structured requirements, alternative OR-groups, and experience levels.</p>
         </div>
+        <button id="btn-ai-parse-jd" class="btn btn-brand-outline btn-sm">
+          <i class="bi bi-file-earmark-code me-1"></i> Parse JD Semantically
+        </button>
+      </div>
 
-        <div id="ai-jd-loading-spinner" class="d-none text-center py-4">
-          <div class="spinner-border text-info" role="status">
-            <span class="visually-hidden">Parsing Job Description...</span>
-          </div>
-          <p class="mt-2 text-muted">Extracting semantic JD requirements with Gemini AI...</p>
+      <div id="ai-jd-loading-spinner" class="d-none text-center py-4">
+        <div class="spinner-border text-info" role="status">
+          <span class="visually-hidden">Parsing Job Description...</span>
         </div>
+        <p class="mt-2 text-muted small">Extracting semantic requirements with Gemini AI...</p>
+      </div>
 
-        <div id="ai-jd-error-alert" class="alert alert-warning d-none" role="alert">
-          <i class="bi bi-info-circle-fill me-2"></i><span id="ai-jd-error-text"></span>
-        </div>
+      <div id="ai-jd-error-alert" class="alert alert-info d-none" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i><span id="ai-jd-error-text"></span>
+      </div>
 
-        <div id="ai-jd-results-container" class="mt-3 d-none">
-          <!-- Dynamically populated AI semantic JD cards -->
-        </div>
+      <div id="ai-jd-results-container" class="mt-3 d-none">
+        <!-- Dynamically populated AI semantic JD cards -->
       </div>
     </div>
 
-    <div class="text-center mt-4">
-      <a class="btn btn-brand btn-lg mt-3" href="/download-report">
-        <i class="bi bi-download me-2"></i>
-        Download PDF Report
-      </a>
-      <a href="/analyze" class="btn btn-outline-primary ms-2 mt-3">
-        <i class="bi bi-arrow-repeat"></i>
-        Analyze Another Resume
-      </a>
+    <!-- ================= 8. BOTTOM ACTIONS TOOLBAR ================= -->
+    <div class="dashboard-actions-card my-4">
+      <h4 class="fw-bold mb-2">Ready to take your resume to the next level?</h4>
+      <p class="text-muted small mb-4">Download your complete multi-page analysis PDF or run another resume match.</p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a class="btn btn-brand btn-lg" href="/download-report">
+          <i class="bi bi-file-earmark-pdf-fill me-1"></i> Download PDF Report
+        </a>
+        <a href="/analyze" class="btn btn-brand-outline btn-lg">
+          <i class="bi bi-arrow-repeat me-1"></i> Analyze Another Resume
+        </a>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- Embedded Client Scripts for Optional AI Actions -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   const btn = document.getElementById("btn-ai-improve");
-  if (!btn) return;
+  if (btn) {
+    btn.addEventListener("click", function () {
+      const spinner = document.getElementById("ai-loading-spinner");
+      const errorAlert = document.getElementById("ai-error-alert");
+      const errorText = document.getElementById("ai-error-text");
+      const resultsContainer = document.getElementById("ai-results-container");
 
-  btn.addEventListener("click", function () {
-    const spinner = document.getElementById("ai-loading-spinner");
-    const errorAlert = document.getElementById("ai-error-alert");
-    const errorText = document.getElementById("ai-error-text");
-    const resultsContainer = document.getElementById("ai-results-container");
+      btn.disabled = true;
+      spinner.classList.remove("d-none");
+      errorAlert.classList.add("d-none");
+      resultsContainer.classList.add("d-none");
 
-    btn.disabled = true;
-    spinner.classList.remove("d-none");
-    errorAlert.classList.add("d-none");
-    resultsContainer.classList.add("d-none");
+      const sampleBullets = [
+        "Developed web applications using Python and backend frameworks.",
+        "Worked on database queries and API integration for software projects.",
+        "Collaborated with team members to deliver features and fix bugs."
+      ].join("\n");
 
-    const sampleBullets = [
-      "Developed web applications using Python and Flask framework.",
-      "Worked on database queries and API integration for software projects.",
-      "Collaborated with team members to deliver features and fix software bugs."
-    ].join("\n");
-
-    fetch("/api/ai/improve", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        resume_text: sampleBullets,
-        job_description: document.body.innerText.substring(0, 1000),
-        missing_skills: {{ missing | tojson }}
+      fetch("/api/ai/improve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          resume_text: sampleBullets,
+          job_description: document.body.innerText.substring(0, 1000),
+          missing_skills: {{ missing | tojson }}
+        })
       })
-    })
-    .then(res => {
-      return res.json().then(data => ({ status: res.status, data }));
-    })
-    .then(({ status, data }) => {
-      spinner.classList.add("d-none");
-      btn.disabled = false;
+      .then(res => res.json().then(data => ({ status: res.status, data })))
+      .then(({ status, data }) => {
+        spinner.classList.add("d-none");
+        btn.disabled = false;
 
-      if (status !== 200 || data.error) {
-        errorText.innerText = data.error || "AI service is currently unavailable.";
-        errorAlert.classList.remove("d-none");
-        return;
-      }
+        if (status !== 200 || data.error) {
+          if (status === 503 || (data.error && data.error.includes("GEMINI_API_KEY"))) {
+            errorText.innerHTML = "<strong>AI enhancements are optional.</strong> Set the <code>GEMINI_API_KEY</code> environment variable to enable bullet optimization and semantic JD analysis. Deterministic ATS scoring remains fully functional.";
+          } else {
+            errorText.innerText = data.error || "AI service is currently unavailable.";
+          }
+          errorAlert.classList.remove("d-none");
+          return;
+        }
 
-      if (data.improvements && data.improvements.length > 0) {
-        let html = '<div class="row g-3">';
-        data.improvements.forEach(item => {
-          html += `
-            <div class="col-12">
-              <div class="border rounded p-3 bg-light">
-                <div class="d-flex justify-content-between mb-2">
-                  <span class="badge bg-secondary">Original Bullet</span>
-                  <span class="badge bg-info text-dark">Impact: ${item.impact_level || 'High'}</span>
+        if (data.improvements && data.improvements.length > 0) {
+          let html = '<div class="row g-3">';
+          data.improvements.forEach(item => {
+            html += `
+              <div class="col-12">
+                <div class="border rounded p-3 bg-light">
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="badge bg-secondary">Original Bullet</span>
+                    <span class="badge badge-info-subtle">Impact: ${item.impact_level || 'High'}</span>
+                  </div>
+                  <p class="text-muted small mb-3">"${item.original}"</p>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="badge bg-success">ATS Optimized Bullet</span>
+                  </div>
+                  <p class="fw-semibold text-dark mb-2">"${item.improved}"</p>
+                  <p class="small text-muted mb-2"><strong>Why it's better:</strong> ${item.reason}</p>
+                  ${item.keywords_added && item.keywords_added.length > 0 ? `<div class="mt-2"><small class="text-muted">Keywords Added: </small>${item.keywords_added.map(k => `<span class="badge bg-white text-dark border me-1">${k}</span>`).join('')}</div>` : ''}
                 </div>
-                <p class="text-muted small mb-3">"${item.original}"</p>
-                <div class="d-flex justify-content-between mb-2">
-                  <span class="badge bg-success">ATS Optimized Bullet</span>
-                </div>
-                <p class="fw-semibold text-dark mb-2">"${item.improved}"</p>
-                <p class="small text-muted mb-2"><strong>Why it's better:</strong> ${item.reason}</p>
-                ${item.keywords_added && item.keywords_added.length > 0 ? `<div class="mt-2"><small class="text-muted">Keywords Added: </small>${item.keywords_added.map(k => `<span class="badge bg-white text-dark border me-1">${k}</span>`).join('')}</div>` : ''}
               </div>
-            </div>
-          `;
-        });
-        html += '</div>';
-        resultsContainer.innerHTML = html;
-        resultsContainer.classList.remove("d-none");
-      } else {
-        errorText.innerText = "No bullet points could be extracted for AI optimization.";
+            `;
+          });
+          html += '</div>';
+          resultsContainer.innerHTML = html;
+          resultsContainer.classList.remove("d-none");
+        } else {
+          errorText.innerText = "No bullet points could be extracted for AI optimization.";
+          errorAlert.classList.remove("d-none");
+        }
+      })
+      .catch(err => {
+        spinner.classList.add("d-none");
+        btn.disabled = false;
+        errorText.innerHTML = "<strong>AI service unavailable.</strong> Deterministic ATS evaluation and report generation remain unaffected.";
         errorAlert.classList.remove("d-none");
-      }
-    })
-    .catch(err => {
-      spinner.classList.add("d-none");
-      btn.disabled = false;
-      errorText.innerText = "Network error connecting to AI service.";
-      errorAlert.classList.remove("d-none");
+      });
     });
-  });
+  }
 
   const btnJd = document.getElementById("btn-ai-parse-jd");
   if (btnJd) {
@@ -715,7 +614,11 @@ document.addEventListener("DOMContentLoaded", function () {
         btnJd.disabled = false;
 
         if (status !== 200 || !data.success) {
-          errorTextJd.innerText = data.error || "Unable to semantically parse job description.";
+          if (status === 503 || (data.error && data.error.includes("Gemini"))) {
+            errorTextJd.innerHTML = "<strong>AI enhancements are optional.</strong> Set the <code>GEMINI_API_KEY</code> environment variable to enable semantic JD parsing. Deterministic ATS scoring remains fully functional.";
+          } else {
+            errorTextJd.innerText = data.error || "Unable to semantically parse job description.";
+          }
           errorAlertJd.classList.remove("d-none");
           return;
         }
@@ -726,23 +629,23 @@ document.addEventListener("DOMContentLoaded", function () {
             <h5 class="fw-bold mb-3">📋 Role: ${a.job_title || 'Software Engineering Role'}</h5>
             <div class="row g-3">
               <div class="col-md-6">
-                <h6 class="fw-semibold">Required Skills</h6>
+                <h6 class="fw-semibold small text-uppercase text-muted">Required Skills</h6>
                 <div>${(a.required_skills && a.required_skills.length) ? a.required_skills.map(s => `<span class="badge bg-primary me-1 mb-1">${typeof s === 'object' ? (s.skill || JSON.stringify(s)) : s}</span>`).join('') : '<span class="text-muted small">None specified</span>'}</div>
               </div>
               <div class="col-md-6">
-                <h6 class="fw-semibold">Preferred / Nice-to-Have Skills</h6>
+                <h6 class="fw-semibold small text-uppercase text-muted">Preferred / Nice-to-Have Skills</h6>
                 <div>${(a.preferred_skills && a.preferred_skills.length) ? a.preferred_skills.map(s => `<span class="badge bg-secondary me-1 mb-1">${typeof s === 'object' ? (s.skill || JSON.stringify(s)) : s}</span>`).join('') : '<span class="text-muted small">None specified</span>'}</div>
               </div>
               <div class="col-md-6">
-                <h6 class="fw-semibold">Tools & Platforms</h6>
+                <h6 class="fw-semibold small text-uppercase text-muted">Tools & Platforms</h6>
                 <div>${(a.tools_and_platforms && a.tools_and_platforms.length) ? a.tools_and_platforms.map(t => `<span class="badge bg-dark me-1 mb-1">${t}</span>`).join('') : '<span class="text-muted small">None specified</span>'}</div>
               </div>
               <div class="col-md-6">
-                <h6 class="fw-semibold">Alternative OR Requirements</h6>
+                <h6 class="fw-semibold small text-uppercase text-muted">Alternative OR Requirements</h6>
                 <div>${(a.alternative_requirements && a.alternative_requirements.length) ? a.alternative_requirements.map(alt => `<span class="badge bg-info text-dark me-1 mb-1">${(alt.group || alt).join(' OR ')}</span>`).join('') : '<span class="text-muted small">None specified</span>'}</div>
               </div>
               <div class="col-12">
-                <h6 class="fw-semibold">Experience & Education Requirements</h6>
+                <h6 class="fw-semibold small text-uppercase text-muted">Experience & Education Requirements</h6>
                 <p class="small text-muted mb-0">
                   ${(a.experience_requirements && a.experience_requirements.length) ? a.experience_requirements.map(e => e.requirement || e).join(' • ') : 'Standard experience'} |
                   ${(a.education_requirements && a.education_requirements.length) ? a.education_requirements.join(' • ') : 'Bachelor degree'}
@@ -757,11 +660,13 @@ document.addEventListener("DOMContentLoaded", function () {
       .catch(err => {
         spinnerJd.classList.add("d-none");
         btnJd.disabled = false;
-        errorTextJd.innerText = "Network error connecting to AI service.";
+        errorTextJd.innerHTML = "<strong>AI service unavailable.</strong> Deterministic ATS evaluation and report generation remain unaffected.";
         errorAlertJd.classList.remove("d-none");
       });
     });
   }
 });
 </script>
-{% endif %} {% endblock %}
+
+{% endif %}
+{% endblock %}

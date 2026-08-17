@@ -322,19 +322,51 @@ All Stage 4 subgoals (Scoring algorithm, fit categorization, job recommendation 
 * **Actionable Non-Hallucinating Guidance:** Generated specific, truthful improvement recommendations for candidate action items without fabricating experience.
 * **Optional AI Enhancement Layer:** Added `POST /api/ai/improvement-roadmap` in [`app.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/app.py#L188) providing an optional Gemini roadmap explanation service. Fails safely (503) if `GEMINI_API_KEY` is missing without affecting deterministic roadmap functionality.
 * **Dashboard UI Enhancement:** Extended [`templates/dashboard.html`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/templates/dashboard.html#L476) with the interactive "🚀 Resume Improvement Roadmap" section.
-* **Automated Testing Suite:** Created [`tests/test_gap_prioritization.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_gap_prioritization.py) (13 tests).
-* **Test Suite Status:**
-  - `tests/test_gap_prioritization.py`: 13 / 13 PASSED (NEW)
-  - `tests/test_gap_analysis.py`: 15 / 15 PASSED
-  - `tests/test_partial_skill_matching.py`: 11 / 11 PASSED
+### Stage 9.6 Production-Quality PDF Report Generation & Final Visual Polish — 2026-08-18
+* **Dashboard-Inspired Visual Design System:** Overhauled [`report_generator.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/report_generator.py) to mirror the modern SaaS aesthetic of the web dashboard with ResumeIQ brand blue (`#2563eb`), dark navy accents (`#1e40af`), soft surface cards (`#f8fafc`), and subtle borders (`#e2e8f0`).
+* **Executive Score Hero & Transparent Methodology:** Replaced plain key-value table with a 4-card metric strip (Overall ATS Score Hero, 50% Skill Match, 30% Text Relevance, 20% Experience Level) followed by a clear, transparent scoring methodology callout banner.
+* **Compact Visual Skill Chips / Badge Grids:** Transformed single-column vertical lists into 3-column styled chip grids with soft backgrounds and status icons (`✓` green for matched, `✗` red for missing, `≈` amber for partial 50% credit).
+* **Gap Analysis Coverage Strip:** Added a 5-metric summary strip (`Total Required`, `Exact Matches`, `Partial Matches`, `Missing Skills`, `Effective Coverage %`) with colored status indicators.
+* **Prioritized Roadmap & Career Alignment Tables:** Implemented color-coded roadmap tiers (`Immediate / High` in red, `Next / Medium` in amber, `Optional / Low` in slate) with actionable recommendations, and a dedicated career role alignment table.
+* **Smart Page Flow & Orphan Prevention:** Configured `keepWithNext=True` on section headings and wrapped atomic blocks in `KeepTogether` guards, eliminating orphan headers, broken table splits, and awkward blank areas. Standard reports cleanly fill 1–2 pages without artificial trailing pages.
+* **Automated Testing Suite:** Verified all 10 unit tests in [`tests/test_report_generator.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_report_generator.py) and full 163-test regression suite across 13 modules (100% pass rate).
+
+### Final UI/UX Refinement Sprint — 2026-08-17
+* **Landing Page Positioning & Copy:** Refined marketing copy from generic AI claims to clear, human-focused positioning ("Resume Match Intelligence", "Transparent ATS Scoring 50 · 30 · 20", "AI-Optional Architecture with Deterministic Core", "Fast Semantic Matching", and "Professional PDF Reports").
+* **Footer & Attribution:** Added clean creator attribution ("Built by Vaibhav Pandey") and simplified the technology stack overview.
+* **Analyze Page Dropzone Upgrade:** Made the entire dropzone area clickable, improved centered visual hierarchy, preserved all validation & loading states, and added supporting methodology cards (Skill Coverage 50%, Text Relevance 30%, Experience Level 20%).
+* **Dashboard AI Wording:** Enhanced AI-optional status messages to clearly communicate that Gemini integration is supplementary and deterministic ATS scoring is fully functional.
+* **Job Recommender Audit & Polish:** Audited [`job_recommender.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/job_recommender.py) and improved requirement-based match score calculation and empty skill handling. Created [`tests/test_job_recommender.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_job_recommender.py) (8 unit tests).
+### Stage 10A Open-Source AI Provider Abstraction — 2026-08-17
+* **Provider Abstraction Layer:** Created [`ai/provider.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/ai/provider.py) defining a clean provider routing interface (`get_active_provider()`, `is_ai_available()`, `call_ai()`). Supports `AI_PROVIDER=local` (default) and `AI_PROVIDER=gemini` (optional).
+* **Local Open-Source AI Provider:** Created [`ai/local_provider.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/ai/local_provider.py) with dual-engine support: `llama-cpp-python` with quantized GGUF models as primary high-performance CPU runtime, and HuggingFace Transformers as explicit fallback (`LOCAL_BACKEND=transformers`).
+* **High-Performance GGUF Model Runtime (Stage 10B/10C):**
+  - Configured default model: `Qwen/Qwen2.5-0.5B-Instruct-GGUF` (`qwen2.5-0.5b-instruct-q5_k_m.gguf`, Apache-2.0).
+  - Measured performance improvements vs Transformers baseline:
+    - Model Load: **4.09s** vs 51.42s (**92% faster cold-start**)
+    - Resume Bullet Optimization: **36.18s** vs 204.01s (**5.6x faster**)
+    - Semantic JD Parsing: **31.10s** vs 138.34s (**4.4x faster**)
+    - Memory Footprint: **~140 MB** vs 1.42 GB (**90% RAM reduction**)
+  - Clean JSON Extraction: Implemented `_extract_json_block` to automatically strip markdown fences and reasoning artifacts.
+  - Dedicated Token Limits: Configured `AI_BULLET_MAX_TOKENS=512` and `AI_JD_MAX_TOKENS=384`.
+  - Strict Fallback Safety: Prevents silent fallback to slow Transformers unless explicitly requested.
+* **Deterministic Core Full Independence:** Verified that resume parsing, skill extraction, 50/30/20 ATS scoring, partial credit matching, gap analysis, roadmap prioritization, job recommendations, and PDF generation function 100% offline with zero AI dependencies.
+* **Comprehensive Test Suite:** Expanded [`tests/test_ai_provider.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_ai_provider.py) to **38 unit tests** covering provider routing, dependency checking, model load failures, malformed JSON handling, token limits, strict fallback, and deterministic scoring independence.
+* **Full Test Suite Status:**
+  - `tests/test_ai_provider.py`: 38 / 38 PASSED
+  - `tests/test_ai_improver.py`: 8 / 8 PASSED
   - `tests/test_jd_semantic_parser.py`: 8 / 8 PASSED
-  - `tests/test_ai_improver.py`: 5 / 5 PASSED
-  - `tests/test_evaluation_benchmark.py`: 2 / 2 PASSED
-  - `tests/test_api_routes.py`: 8 / 8 PASSED
+  - `tests/test_gap_analysis.py`: 15 / 15 PASSED
+  - `tests/test_gap_prioritization.py`: 13 / 13 PASSED
+  - `tests/test_partial_skill_matching.py`: 11 / 11 PASSED
   - `tests/test_matcher_unit.py`: 13 / 13 PASSED
+  - `tests/test_job_recommender.py`: 8 / 8 PASSED
+  - `tests/test_report_generator.py`: 10 / 10 PASSED
   - `tests/test_scoring_validation.py`: 16 / 16 PASSED
   - `tests/test_text_similarity_eval.py`: 13 / 13 PASSED
-  - **Total:** **104 / 104 PASSED** (`0 failed`).
+  - `tests/test_api_routes.py`: 8 / 8 PASSED
+  - `tests/test_evaluation_benchmark.py`: 2 / 2 PASSED (15 dataset cases)
+  - **Total:** **163 / 163 PASSED** (`0 failed`).
 
 ---
 

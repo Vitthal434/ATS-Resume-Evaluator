@@ -1,13 +1,17 @@
 """
-ResumeIQ — Gemini LLM-Driven Job Description Semantic Parser
+ResumeIQ — AI Job Description Semantic Parser
 Parses complex, ambiguous job descriptions into a structured, validated semantic schema.
 Encapsulates anti-hallucination rules and fallback schema handling.
+
+Uses the configured AI provider (ai.provider) — defaults to local open-source model.
+AI_PROVIDER=local (default) or AI_PROVIDER=gemini
 """
 
+import os
 import json
-from typing import Dict, Any, List
+from typing import Dict, Any
 
-from ai.gemini_provider import is_gemini_available, call_gemini_api
+from ai.provider import is_ai_available, call_ai
 
 
 SYSTEM_PROMPT = """
@@ -98,14 +102,19 @@ def validate_semantic_schema(parsed_data: Dict[str, Any]) -> Dict[str, Any]:
 
 def parse_job_description(job_description: str) -> Dict[str, Any]:
     """
-    Semantically parse raw job description text using Gemini LLM.
+    Semantically parse raw job description text using the configured AI provider.
     Returns a dictionary containing 'available', 'error', and 'analysis'.
-    Fallback safely if GEMINI_API_KEY is missing or API call fails.
+    Falls back safely if AI provider is unavailable or call fails.
+
+    Does not modify or influence deterministic ATS scoring in any way.
     """
-    if not is_gemini_available():
+    if not is_ai_available():
         return {
             "available": False,
-            "error": "Gemini AI is not configured (GEMINI_API_KEY environment variable is missing).",
+            "error": (
+                "AI service is not available. Install torch and transformers for local AI, "
+                "or set AI_PROVIDER=gemini with a valid GEMINI_API_KEY."
+            ),
             "analysis": _get_empty_schema()
         }
 
@@ -116,8 +125,7 @@ def parse_job_description(job_description: str) -> Dict[str, Any]:
             "analysis": _get_empty_schema()
         }
 
-    user_prompt = f"""
-{SYSTEM_PROMPT}
+    user_prompt = f"""{SYSTEM_PROMPT}
 
 RAW JOB DESCRIPTION TO PARSE:
 {job_description[:2500]}
@@ -126,7 +134,8 @@ Convert this job description into the structured JSON schema defined above.
 """
 
     try:
-        raw_response = call_gemini_api(user_prompt)
+        jd_max_tokens = int(os.environ.get("AI_JD_MAX_TOKENS", "384"))
+        raw_response = call_ai(user_prompt, max_tokens=jd_max_tokens)
 
         clean_json = raw_response.strip()
         if clean_json.startswith("```json"):
