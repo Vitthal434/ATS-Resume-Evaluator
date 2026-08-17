@@ -8,6 +8,7 @@ from sentence_transformers import SentenceTransformer
 SKILL_WEIGHT = 0.50
 TEXT_WEIGHT = 0.30
 EXPERIENCE_WEIGHT = 0.20
+PARTIAL_MATCH_FACTOR = 0.5  # 50% partial credit factor for related/transferable skills
 
 
 @lru_cache(maxsize=1)
@@ -16,6 +17,47 @@ def get_semantic_model():
 
 
 from skills import ALIAS_INDEX, SKILL_DATABASE
+
+
+def _get_related_skills(skill: str) -> set:
+    """Return explicit related canonical skills for a given canonical skill."""
+    skill = skill.lower()
+    related = set()
+    if skill in SKILL_DATABASE:
+        for rel in SKILL_DATABASE[skill].get("related", []):
+            related.add(rel.lower())
+    for canonical, data in SKILL_DATABASE.items():
+        if skill in [r.lower() for r in data.get("related", [])]:
+            related.add(canonical.lower())
+    return related
+
+
+def _evaluate_requirement_match(req_skills, resume_skills):
+    """
+    Evaluate candidate resume_skills against a required skill or OR-group set.
+    Returns:
+        (ratio, matched_exact, matched_related)
+        - ratio: 1.0 (exact/alias match), PARTIAL_MATCH_FACTOR (partial match), 0.0 (no match)
+        - matched_exact: canonical skill string if exact match, else None
+        - matched_related: canonical skill string if partial match, else None
+    """
+    if not isinstance(req_skills, (set, list, tuple, frozenset)):
+        req_skills = {req_skills}
+    req_set = set(req_skills)
+
+    # 1. Exact or canonical alias match -> 1.0 credit
+    exact_matches = resume_skills & req_set
+    if exact_matches:
+        return 1.0, sorted(exact_matches)[0], None
+
+    # 2. Related / Transferable skill match -> PARTIAL_MATCH_FACTOR credit
+    for req_skill in sorted(req_set):
+        related_set = _get_related_skills(req_skill)
+        candidate_related = resume_skills & related_set
+        if candidate_related:
+            return PARTIAL_MATCH_FACTOR, None, sorted(candidate_related)[0]
+
+    return 0.0, None, None
 
 
 def preprocess(text):
@@ -596,6 +638,8 @@ def calculate_weighted_skill_score(
     Optional skill = 1 point
 
     OR groups count as ONE requirement.
+    Exact match = 1.0 * weight
+    Partial match (explicit related skill) = PARTIAL_MATCH_FACTOR * weight
     """
 
     REQUIRED_WEIGHT = 3
@@ -607,8 +651,8 @@ def calculate_weighted_skill_score(
     optional_alternatives = optional_alternatives or []
     general_alternatives = general_alternatives or []
 
-    matched_weight = 0
-    total_weight = 0
+    matched_weight = 0.0
+    total_weight = 0.0
 
     # ==========================================
     # REQUIRED OR GROUPS
@@ -622,8 +666,8 @@ def calculate_weighted_skill_score(
 
         total_weight += REQUIRED_WEIGHT
 
-        if resume_skills & set(group):
-            matched_weight += REQUIRED_WEIGHT
+        ratio, _, _ = _evaluate_requirement_match(set(group), resume_skills)
+        matched_weight += REQUIRED_WEIGHT * ratio
 
     # ==========================================
     # REQUIRED INDIVIDUAL SKILLS
@@ -636,8 +680,8 @@ def calculate_weighted_skill_score(
 
         total_weight += REQUIRED_WEIGHT
 
-        if skill in resume_skills:
-            matched_weight += REQUIRED_WEIGHT
+        ratio, _, _ = _evaluate_requirement_match({skill}, resume_skills)
+        matched_weight += REQUIRED_WEIGHT * ratio
 
     # ==========================================
     # GENERAL OR GROUPS
@@ -651,8 +695,8 @@ def calculate_weighted_skill_score(
 
         total_weight += GENERAL_WEIGHT
 
-        if resume_skills & set(group):
-            matched_weight += GENERAL_WEIGHT
+        ratio, _, _ = _evaluate_requirement_match(set(group), resume_skills)
+        matched_weight += GENERAL_WEIGHT * ratio
 
     # ==========================================
     # GENERAL INDIVIDUAL SKILLS
@@ -668,8 +712,8 @@ def calculate_weighted_skill_score(
 
         total_weight += GENERAL_WEIGHT
 
-        if skill in resume_skills:
-            matched_weight += GENERAL_WEIGHT
+        ratio, _, _ = _evaluate_requirement_match({skill}, resume_skills)
+        matched_weight += GENERAL_WEIGHT * ratio
 
     # ==========================================
     # OPTIONAL OR GROUPS
@@ -683,8 +727,8 @@ def calculate_weighted_skill_score(
 
         total_weight += OPTIONAL_WEIGHT
 
-        if resume_skills & set(group):
-            matched_weight += OPTIONAL_WEIGHT
+        ratio, _, _ = _evaluate_requirement_match(set(group), resume_skills)
+        matched_weight += OPTIONAL_WEIGHT * ratio
 
     # ==========================================
     # OPTIONAL INDIVIDUAL SKILLS
@@ -697,8 +741,8 @@ def calculate_weighted_skill_score(
 
         total_weight += OPTIONAL_WEIGHT
 
-        if skill in resume_skills:
-            matched_weight += OPTIONAL_WEIGHT
+        ratio, _, _ = _evaluate_requirement_match({skill}, resume_skills)
+        matched_weight += OPTIONAL_WEIGHT * ratio
 
     if total_weight == 0:
         return 0

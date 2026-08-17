@@ -64,6 +64,11 @@ jobs:
           SECRET_KEY: ci-test-secret
         run: python tests/test_jd_semantic_parser.py
 
+      - name: Run Partial Credit Skill Matching Unit Tests
+        env:
+          SECRET_KEY: ci-test-secret
+        run: python tests/test_partial_skill_matching.py
+
   docker-build:
     name: Build Docker Container Image
     needs: test

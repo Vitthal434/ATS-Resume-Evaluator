@@ -276,10 +276,10 @@ All Stage 4 subgoals (Scoring algorithm, fit categorization, job recommendation 
   - `tests/test_text_similarity_eval.py`: 13 / 13 PASSED
   - **Total:** **52 / 52 PASSED** (`0 failed`).
 
-## Stage 9: Advanced AI Capabilities (IN PROGRESS)
+## Stage 9: Advanced AI Capabilities (COMPLETE)
 * `[x]` Stage 9.1: LLM-driven resume bullet optimization ([`ai/gemini_provider.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/ai/gemini_provider.py), [`ai/resume_improver.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/ai/resume_improver.py), [`tests/test_ai_improver.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_ai_improver.py))
 * `[x]` Stage 9.2: LLM-driven complex JD semantic parsing ([`ai/jd_semantic_parser.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/ai/jd_semantic_parser.py), [`tests/test_jd_semantic_parser.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_jd_semantic_parser.py))
-* `[ ]` Stage 9.3: Partial credit matching for related/transferable skills
+* `[x]` Stage 9.3: Partial credit matching for related/transferable skills ([`matcher.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/matcher.py#L11), [`tests/test_partial_skill_matching.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_partial_skill_matching.py))
 
 ### Stage 9.1 LLM-Driven Resume Bullet Optimization — 2026-08-17
 * **Decoupled Architecture:** Built an optional AI enhancement layer under `ai/` (`ai/gemini_provider.py` and `ai/resume_improver.py`) that consumes deterministic ATS evaluation results without modifying the core scoring algorithm.
@@ -296,16 +296,27 @@ All Stage 4 subgoals (Scoring algorithm, fit categorization, job recommendation 
 * **Backend Endpoint:** Added `POST /api/ai/parse-jd` in [`app.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/app.py#L148) returning `{"success": true, "analysis": {...}}`.
 * **Dashboard UX Integration:** Added optional "🔍 AI Semantic JD Analysis" card and button in [`templates/dashboard.html`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/templates/dashboard.html#L410) with interactive AJAX parsing handler.
 * **Automated Testing Suite:** Created [`tests/test_jd_semantic_parser.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_jd_semantic_parser.py) with 8 unit tests mocking the Gemini API provider.
-* **Scoring Formula Integrity:** **Zero changes** to the deterministic 50% Skill / 30% Text Similarity / 20% Experience scoring algorithm.
+
+### Stage 9.3 Partial Credit Matching for Related/Transferable Skills — 2026-08-17
+* **Deterministic Partial Credit Engine:** Enhanced [`matcher.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/matcher.py#L11) with a configurable `PARTIAL_MATCH_FACTOR = 0.5` factor.
+* **Auditable Related Skill Lookups:** Implemented `_get_related_skills(skill)` leveraging the curated `SKILL_DATABASE` relational mappings (e.g. `postgresql` ↔ `sql`, `scikit-learn` ↔ `machine learning`, `pytorch` ↔ `deep learning`).
+* **Controlled Requirement Evaluation:** Implemented `_evaluate_requirement_match(req_group, resume_skills)`:
+  - Exact or canonical alias match -> 1.0 (100% full match credit)
+  - Explicit related skill match -> 0.5 (50% partial match credit)
+  - Unrelated skill -> 0.0 (zero match credit)
+* **Zero Network / Offline Execution:** Purely deterministic Python logic with zero LLM/API dependency in the core ATS scoring loop.
+* **No Double-Counting & Formula Integrity:** Preserved exact 50% Skill / 30% Text Similarity / 20% Experience component weights. Each JD requirement contributes to `matched_weight` at most once.
+* **Automated Testing Suite:** Created [`tests/test_partial_skill_matching.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_partial_skill_matching.py) with 10 dedicated unit tests.
 * **Test Suite Status:**
-  - `tests/test_jd_semantic_parser.py`: 8 / 8 PASSED (NEW)
+  - `tests/test_partial_skill_matching.py`: 10 / 10 PASSED (NEW)
+  - `tests/test_jd_semantic_parser.py`: 8 / 8 PASSED
   - `tests/test_ai_improver.py`: 5 / 5 PASSED
   - `tests/test_evaluation_benchmark.py`: 2 / 2 PASSED
   - `tests/test_api_routes.py`: 8 / 8 PASSED
   - `tests/test_matcher_unit.py`: 13 / 13 PASSED
   - `tests/test_scoring_validation.py`: 16 / 16 PASSED
   - `tests/test_text_similarity_eval.py`: 13 / 13 PASSED
-  - **Total:** **65 / 65 PASSED** (`0 failed`).
+  - **Total:** **75 / 75 PASSED** (`0 failed`).
 
 ---
 
