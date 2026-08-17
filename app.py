@@ -95,6 +95,7 @@ def match():
         missing=result["missing_skills"],
         suggestions=result["suggestions"],
         recommended_jobs=recommended_jobs,
+        gap_analysis=gap_analysis,
     )
 
     return render_template(
