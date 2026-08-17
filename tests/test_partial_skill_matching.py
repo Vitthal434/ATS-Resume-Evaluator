@@ -81,7 +81,7 @@ class TestPartialSkillMatching(unittest.TestCase):
         self.assertEqual(score, 50.0)
 
     def test_07_strict_no_broad_technology_inference(self):
-        """TypeScript should NOT match JavaScript, React should NOT match Redux, Python should NOT match Django unless explicitly related."""
+        """TypeScript should NOT match JavaScript, React should NOT match Redux, Python should NOT match Django."""
         # TypeScript vs JavaScript -> Should be 0.0
         ratio_ts_js, _, _ = _evaluate_requirement_match({"javascript"}, {"typescript"})
         self.assertEqual(ratio_ts_js, 0.0)
@@ -90,18 +90,68 @@ class TestPartialSkillMatching(unittest.TestCase):
         ratio_react_redux, _, _ = _evaluate_requirement_match({"redux"}, {"react"})
         self.assertEqual(ratio_react_redux, 0.0)
 
-        # Python vs Django -> Should be 0.0
+        # Python vs Django -> Should be 0.0 (Python proficiency does NOT imply Django framework proficiency)
         ratio_py_django, _, _ = _evaluate_requirement_match({"django"}, {"python"})
         self.assertEqual(ratio_py_django, 0.0)
 
-    def test_08_no_double_counting(self):
+        # JavaScript vs Node.js -> Should be 0.0
+        ratio_js_node, _, _ = _evaluate_requirement_match({"node.js"}, {"javascript"})
+        self.assertEqual(ratio_js_node, 0.0)
+
+        # Java vs Spring Boot -> Should be 0.0
+        ratio_java_spring, _, _ = _evaluate_requirement_match({"spring boot"}, {"java"})
+        self.assertEqual(ratio_java_spring, 0.0)
+
+        # React vs Next.js -> Should be 0.0
+        ratio_react_next, _, _ = _evaluate_requirement_match({"next.js"}, {"react"})
+        self.assertEqual(ratio_react_next, 0.0)
+
+        # Docker vs Kubernetes -> Should be 0.0
+        ratio_docker_k8s, _, _ = _evaluate_requirement_match({"kubernetes"}, {"docker"})
+        self.assertEqual(ratio_docker_k8s, 0.0)
+
+        # CSS vs Tailwind -> Should be 0.0
+        ratio_css_tailwind, _, _ = _evaluate_requirement_match({"tailwind"}, {"css"})
+        self.assertEqual(ratio_css_tailwind, 0.0)
+
+    def test_08_curated_transferable_concept_relationships(self):
+        """Verify high-confidence transferable concept relationships return 0.5 partial match credit."""
+        # SQL <-> PostgreSQL
+        r_sql_pg, _, _ = _evaluate_requirement_match({"sql"}, {"postgresql"})
+        self.assertEqual(r_sql_pg, PARTIAL_MATCH_FACTOR)
+
+        # Cloud Computing <-> AWS / Azure / GCP
+        r_cloud_aws, _, _ = _evaluate_requirement_match({"aws"}, {"cloud computing"})
+        self.assertEqual(r_cloud_aws, PARTIAL_MATCH_FACTOR)
+
+        # CI/CD <-> Jenkins / GitHub Actions / GitLab CI
+        r_cicd_jenkins, _, _ = _evaluate_requirement_match({"jenkins"}, {"ci cd"})
+        self.assertEqual(r_cicd_jenkins, PARTIAL_MATCH_FACTOR)
+
+        # Containerization <-> Docker
+        r_container_docker, _, _ = _evaluate_requirement_match({"containerization"}, {"docker"})
+        self.assertEqual(r_container_docker, PARTIAL_MATCH_FACTOR)
+
+        # Infrastructure as Code <-> Terraform
+        r_iac_tf, _, _ = _evaluate_requirement_match({"infrastructure as code"}, {"terraform"})
+        self.assertEqual(r_iac_tf, PARTIAL_MATCH_FACTOR)
+
+        # CSS <-> Sass
+        r_css_sass, _, _ = _evaluate_requirement_match({"css"}, {"sass"})
+        self.assertEqual(r_css_sass, PARTIAL_MATCH_FACTOR)
+
+        # Redux <-> Redux Toolkit
+        r_redux_rtk, _, _ = _evaluate_requirement_match({"redux toolkit"}, {"redux"})
+        self.assertEqual(r_redux_rtk, PARTIAL_MATCH_FACTOR)
+
+    def test_09_no_double_counting(self):
         """Evaluating a requirement with partial match should not double-count total weights."""
         # 2 required skills (total weight 6): Python (exact) + SQL (partial via postgresql)
         # Matched weight: 3*1.0 + 3*0.5 = 4.5. Score = (4.5 / 6.0) * 100 = 75.0%
         score = calculate_weighted_skill_score({"python", "postgresql"}, {"python", "sql"}, set())
         self.assertEqual(score, 75.0)
 
-    def test_09_or_group_partial_match(self):
+    def test_10_or_group_partial_match(self):
         """OR-group requirement receives 1.0 if exact match exists, or 0.5 if related skill exists."""
         # OR group: Python or Go
         ratio_exact, _, _ = _evaluate_requirement_match({"python", "go"}, {"python"})
@@ -111,7 +161,7 @@ class TestPartialSkillMatching(unittest.TestCase):
         ratio_partial, _, _ = _evaluate_requirement_match({"sql", "mongodb"}, {"postgresql"})
         self.assertEqual(ratio_partial, 0.5)
 
-    def test_10_deterministic_no_network_calls(self):
+    def test_11_deterministic_no_network_calls(self):
         """Deterministic scoring produces results offline without any API calls."""
         res = final_match_score(
             "Experienced software developer with PostgreSQL database skills.",

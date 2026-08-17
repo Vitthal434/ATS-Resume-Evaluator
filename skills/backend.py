@@ -18,16 +18,19 @@ BACKEND_SKILLS = {
         "display": "Node.js",
         "category": "backend",
         "aliases": ["node", "nodejs"],
+        "related": ["express", "nestjs"],
     },
     "express": {
         "display": "Express.js",
         "category": "backend",
         "aliases": ["expressjs"],
+        "related": ["node.js"],
     },
     "nestjs": {
         "display": "NestJS",
         "category": "backend",
         "aliases": ["nest.js"],
+        "related": ["node.js"],
     },
     "spring boot": {
         "display": "Spring Boot",

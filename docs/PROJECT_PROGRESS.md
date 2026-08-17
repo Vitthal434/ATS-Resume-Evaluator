@@ -280,6 +280,7 @@ All Stage 4 subgoals (Scoring algorithm, fit categorization, job recommendation 
 * `[x]` Stage 9.1: LLM-driven resume bullet optimization ([`ai/gemini_provider.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/ai/gemini_provider.py), [`ai/resume_improver.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/ai/resume_improver.py), [`tests/test_ai_improver.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_ai_improver.py))
 * `[x]` Stage 9.2: LLM-driven complex JD semantic parsing ([`ai/jd_semantic_parser.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/ai/jd_semantic_parser.py), [`tests/test_jd_semantic_parser.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_jd_semantic_parser.py))
 * `[x]` Stage 9.3: Partial credit matching for related/transferable skills ([`matcher.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/matcher.py#L11), [`tests/test_partial_skill_matching.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_partial_skill_matching.py))
+* `[x]` Stage 9.4: Intelligent resume-job gap analysis ([`gap_analyzer.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/gap_analyzer.py), [`tests/test_gap_analysis.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_gap_analysis.py))
 
 ### Stage 9.1 LLM-Driven Resume Bullet Optimization — 2026-08-17
 * **Decoupled Architecture:** Built an optional AI enhancement layer under `ai/` (`ai/gemini_provider.py` and `ai/resume_improver.py`) that consumes deterministic ATS evaluation results without modifying the core scoring algorithm.
@@ -307,8 +308,24 @@ All Stage 4 subgoals (Scoring algorithm, fit categorization, job recommendation 
 * **Zero Network / Offline Execution:** Purely deterministic Python logic with zero LLM/API dependency in the core ATS scoring loop.
 * **No Double-Counting & Formula Integrity:** Preserved exact 50% Skill / 30% Text Similarity / 20% Experience component weights. Each JD requirement contributes to `matched_weight` at most once.
 * **Automated Testing Suite:** Created [`tests/test_partial_skill_matching.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_partial_skill_matching.py) with 10 dedicated unit tests.
+
+### Stage 9.4 Intelligent Resume-Job Gap Analysis & Expanded Skill Relationships — 2026-08-17
+* **Deterministic Gap Analyzer Module:** Created [`gap_analyzer.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/gap_analyzer.py) exposing `analyze_resume_job_gap(resume_text, job_text)` to categorize JD requirements into `exact_matches`, `partial_matches`, `missing_skills`, and `recommendations`.
+* **Expanded High-Confidence Relational Database:** Added curated, defensible technical relationships across language/framework pairs, cloud platforms, DevOps tools, and frontend/backend skill sets:
+  - Language ↔ Framework: `python` ↔ `flask`, `django`, `fastapi`; `javascript` ↔ `node.js`, `express`; `java` ↔ `spring boot`; `ruby` ↔ `ruby on rails`; `php` ↔ `laravel`
+  - Frontend & State: `react` ↔ `next.js`; `redux` ↔ `redux toolkit`; `css` ↔ `sass`, `less`
+  - Cloud & DevOps: `cloud computing` ↔ `aws`, `azure`, `gcp`; `ci cd` ↔ `jenkins`, `github actions`, `gitlab ci`; `containerization` ↔ `docker`; `infrastructure as code` ↔ `terraform`, `cloudformation`
+* **Conservative Priority Matrix:**
+  - `CRITICAL`: Missing required skills or required OR-group requirements.
+  - `HIGH`: Partial matches for required skills, or missing general role requirements.
+  - `MEDIUM`: Missing preferred / optional skills or general partial matches.
+  - `LOW`: Partial matches for preferred / optional skills.
+* **Optional Gemini AI Enhancement:** Implemented `enhance_gap_analysis_with_ai(gap_analysis, job_text)` to optionally generate a 3-step prioritized learning roadmap without modifying ATS scores or candidate facts. Fails safely if `GEMINI_API_KEY` is missing or API fails.
+* **Backend API & UI Integration:** Added `POST /api/gap-analysis` in [`app.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/app.py#L170) and integrated the "🎯 Resume–Job Gap Analysis" card into [`templates/dashboard.html`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/templates/dashboard.html#L380).
+* **Automated Testing Suite:** Created [`tests/test_gap_analysis.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_gap_analysis.py) (15 tests) and updated [`tests/test_partial_skill_matching.py`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/tests/test_partial_skill_matching.py) (11 tests).
 * **Test Suite Status:**
-  - `tests/test_partial_skill_matching.py`: 10 / 10 PASSED (NEW)
+  - `tests/test_gap_analysis.py`: 15 / 15 PASSED
+  - `tests/test_partial_skill_matching.py`: 11 / 11 PASSED
   - `tests/test_jd_semantic_parser.py`: 8 / 8 PASSED
   - `tests/test_ai_improver.py`: 5 / 5 PASSED
   - `tests/test_evaluation_benchmark.py`: 2 / 2 PASSED
@@ -316,7 +333,7 @@ All Stage 4 subgoals (Scoring algorithm, fit categorization, job recommendation 
   - `tests/test_matcher_unit.py`: 13 / 13 PASSED
   - `tests/test_scoring_validation.py`: 16 / 16 PASSED
   - `tests/test_text_similarity_eval.py`: 13 / 13 PASSED
-  - **Total:** **75 / 75 PASSED** (`0 failed`).
+  - **Total:** **91 / 91 PASSED** (`0 failed`).
 
 ---
 

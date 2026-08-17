@@ -12,6 +12,7 @@ FRONTEND_SKILLS = {
         "aliases": [
             "css3",
         ],
+        "related": ["sass", "less"],
     },
     "bootstrap": {
         "display": "Bootstrap",
@@ -52,11 +53,13 @@ FRONTEND_SKILLS = {
         "display": "Redux",
         "category": "frontend",
         "aliases": [],
+        "related": ["redux toolkit"],
     },
     "redux toolkit": {
         "display": "Redux Toolkit",
         "category": "frontend",
         "aliases": ["@reduxjs/toolkit"],
+        "related": ["redux"],
     },
     "react query": {
         "display": "React Query",

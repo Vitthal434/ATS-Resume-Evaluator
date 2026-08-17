@@ -3,6 +3,7 @@ DEVOPS_SKILLS = {
         "display": "Docker",
         "category": "cloud_devops",
         "aliases": [],
+        "related": ["containerization"],
     },
     "kubernetes": {
         "display": "Kubernetes",
@@ -15,6 +16,7 @@ DEVOPS_SKILLS = {
         "display": "Terraform",
         "category": "cloud_devops",
         "aliases": [],
+        "related": ["infrastructure as code"],
     },
     "cloudformation": {
         "display": "CloudFormation",
@@ -22,6 +24,7 @@ DEVOPS_SKILLS = {
         "aliases": [
             "aws cloudformation",
         ],
+        "related": ["infrastructure as code"],
     },
     "ansible": {
         "display": "Ansible",
@@ -32,11 +35,13 @@ DEVOPS_SKILLS = {
         "display": "Jenkins",
         "category": "cloud_devops",
         "aliases": [],
+        "related": ["ci cd"],
     },
     "github actions": {
         "display": "GitHub Actions",
         "category": "cloud_devops",
         "aliases": [],
+        "related": ["ci cd"],
     },
     "gitlab ci": {
         "display": "GitLab CI",
@@ -44,6 +49,7 @@ DEVOPS_SKILLS = {
         "aliases": [
             "gitlab ci/cd",
         ],
+        "related": ["ci cd"],
     },
     "helm": {
         "display": "Helm",
@@ -66,6 +72,7 @@ DEVOPS_SKILLS = {
             "continuous delivery",
             "continuous deployment",
         ],
+        "related": ["jenkins", "github actions", "gitlab ci"],
     },
     "infrastructure as code": {
         "display": "Infrastructure as Code",
@@ -75,6 +82,7 @@ DEVOPS_SKILLS = {
             "infrastructure-as-code",
             "infrastructure as code",
         ],
+        "related": ["terraform", "cloudformation"],
     },
     "containerization": {
         "display": "Containerization",
@@ -84,6 +92,7 @@ DEVOPS_SKILLS = {
             "containerization",
             "containers",
         ],
+        "related": ["docker"],
     },
     "linux": {
         "display": "Linux",

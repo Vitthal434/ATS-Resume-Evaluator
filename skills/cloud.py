@@ -1,13 +1,21 @@
 CLOUD_SKILLS = {
+    "cloud computing": {
+        "display": "Cloud Computing",
+        "category": "cloud_devops",
+        "aliases": ["cloud"],
+        "related": ["aws", "azure", "gcp"],
+    },
     "aws": {
         "display": "AWS",
         "category": "cloud_devops",
         "aliases": ["amazon web services"],
+        "related": ["cloud computing"],
     },
     "azure": {
         "display": "Azure",
         "category": "cloud_devops",
         "aliases": ["microsoft azure"],
+        "related": ["cloud computing"],
     },
     "gcp": {
         "display": "GCP",
@@ -16,6 +24,7 @@ CLOUD_SKILLS = {
             "google cloud",
             "google cloud platform",
         ],
+        "related": ["cloud computing"],
     },
     # AWS Services
     "ec2": {
