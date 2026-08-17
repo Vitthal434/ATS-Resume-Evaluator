@@ -626,6 +626,29 @@ class TestScoringValidation(unittest.TestCase):
         self.assertAlmostEqual(reported, expected, places=1,
             msg=f"ATS score arithmetic mismatch: reported={reported}, expected={expected}.")
 
+    # -----------------------------------------------------------------
+    # TC-16  Job recommender canonical matching
+    # -----------------------------------------------------------------
+    def test_16_job_recommender(self):
+        """
+        EXPECTATION: Frontend resume skills (including canonical react.js and rest api)
+        should recommend Frontend/React Developer with high match score.
+        """
+        _header("TC-16", "Job recommender canonical skill matching")
+
+        from job_recommender import recommend_jobs
+        frontend_skills = ["javascript", "typescript", "react.js", "html", "css", "git", "rest api"]
+
+        recs = recommend_jobs(frontend_skills)
+        _report("Top recommendation", recs[0]["job"] if recs else "None")
+        _report("Top score", f"{recs[0]['score']}%" if recs else "0%")
+
+        rec_jobs = [r["job"] for r in recs]
+        self.assertIn("React Developer", rec_jobs)
+        self.assertIn("Frontend Developer", rec_jobs)
+        self.assertGreaterEqual(recs[0]["score"], 80)
+
+
 
 # =====================================================================
 # MAIN — can also be run directly as a script

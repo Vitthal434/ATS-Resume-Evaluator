@@ -372,7 +372,12 @@ def extract_education_requirements(text):
     for keyword in EDUCATION_KEYWORDS:
         normalized_keyword = preprocess(keyword)
 
-        if normalized_keyword in normalized_text:
+        if not normalized_keyword:
+            continue
+
+        pattern = _skill_match_pattern(normalized_keyword)
+
+        if re.search(pattern, normalized_text):
             found.add(keyword)
 
     return sorted(found)

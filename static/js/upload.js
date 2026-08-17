@@ -84,3 +84,40 @@ removeButton.addEventListener("click",()=>{
     removeButton.style.display="none";
 
 });
+
+const analyzeForm = document.querySelector("form[action='/match']");
+
+if (analyzeForm) {
+    analyzeForm.addEventListener("submit", (e) => {
+        const submitBtn = analyzeForm.querySelector("button[type='submit']");
+        const jdTextarea = analyzeForm.querySelector("textarea[name='job_description']");
+
+        if (!fileInput || !fileInput.files.length) {
+            alert("Please select or upload a resume file.");
+            e.preventDefault();
+            return;
+        }
+
+        if (!jdTextarea || !jdTextarea.value.trim()) {
+            alert("Please paste a job description.");
+            e.preventDefault();
+            return;
+        }
+
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Analyzing Resume...
+            `;
+        }
+    });
+
+    window.addEventListener("pageshow", () => {
+        const submitBtn = analyzeForm.querySelector("button[type='submit']");
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = "Analyze Resume";
+        }
+    });
+}

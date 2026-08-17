@@ -1,0 +1,77 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run Python Regression Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Core Matcher Unit Tests
+        env:
+          SECRET_KEY: ci-test-secret
+        run: python tests/test_matcher_unit.py
+
+      - name: Run ATS Scoring Validation Tests
+        env:
+          SECRET_KEY: ci-test-secret
+        run: python tests/test_scoring_validation.py
+
+      - name: Run Text Similarity Evaluation Tests
+        env:
+          SECRET_KEY: ci-test-secret
+        run: python tests/test_text_similarity_eval.py
+
+      - name: Run Flask API Route Integration Tests
+        env:
+          SECRET_KEY: ci-test-secret
+        run: python tests/test_api_routes.py
+
+      - name: Run Evaluation Benchmark Harness
+        env:
+          SECRET_KEY: ci-test-secret
+        run: python tests/test_evaluation_benchmark.py
+
+      - name: Run AI Resume Improver Unit Tests
+        env:
+          SECRET_KEY: ci-test-secret
+        run: python tests/test_ai_improver.py
+
+      - name: Run AI Semantic JD Parser Unit Tests
+        env:
+          SECRET_KEY: ci-test-secret
+        run: python tests/test_jd_semantic_parser.py
+
+  docker-build:
+    name: Build Docker Container Image
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build ResumeIQ Docker Image
+        run: docker build -t resumeiq:ci .

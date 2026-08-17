@@ -245,11 +245,6 @@
             </p>
 
             <div class="recommendation-info">
-              <span>
-                📈 Estimated ATS Gain
-                <strong>+8%</strong>
-              </span>
-
               <span> ⏱ 15–20 Minutes </span>
             </div>
 
@@ -383,16 +378,231 @@
       </div>
     </div>
 
+    <div class="card dashboard-card mt-5" id="ai-improvement-section">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+          <div>
+            <h4 class="section-title mb-1">✨ AI Resume Bullet Optimization</h4>
+            <p class="text-muted mb-0">Optional LLM-driven bullet rewrites aligned with ATS requirements and missing skills.</p>
+          </div>
+          <button id="btn-ai-improve" class="btn btn-outline-primary">
+            <i class="bi bi-stars me-2"></i>Improve Bullets with AI
+          </button>
+        </div>
+
+        <div id="ai-loading-spinner" class="d-none text-center py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Analyzing with AI...</span>
+          </div>
+          <p class="mt-2 text-muted">Optimizing resume bullet points with Gemini AI...</p>
+        </div>
+
+        <div id="ai-error-alert" class="alert alert-warning d-none" role="alert">
+          <i class="bi bi-info-circle-fill me-2"></i><span id="ai-error-text"></span>
+        </div>
+
+        <div id="ai-results-container" class="mt-3 d-none">
+          <!-- Dynamically populated AI improvement cards -->
+        </div>
+      </div>
+    </div>
+
+    <div class="card dashboard-card mt-4" id="ai-jd-parse-section">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+          <div>
+            <h4 class="section-title mb-1">🔍 AI Semantic JD Analysis</h4>
+            <p class="text-muted mb-0">Optional LLM extraction of required/preferred skills, alternative OR groups, and education requirements.</p>
+          </div>
+          <button id="btn-ai-parse-jd" class="btn btn-outline-info">
+            <i class="bi bi-file-earmark-code me-2"></i>Parse JD Semantically
+          </button>
+        </div>
+
+        <div id="ai-jd-loading-spinner" class="d-none text-center py-4">
+          <div class="spinner-border text-info" role="status">
+            <span class="visually-hidden">Parsing Job Description...</span>
+          </div>
+          <p class="mt-2 text-muted">Extracting semantic JD requirements with Gemini AI...</p>
+        </div>
+
+        <div id="ai-jd-error-alert" class="alert alert-warning d-none" role="alert">
+          <i class="bi bi-info-circle-fill me-2"></i><span id="ai-jd-error-text"></span>
+        </div>
+
+        <div id="ai-jd-results-container" class="mt-3 d-none">
+          <!-- Dynamically populated AI semantic JD cards -->
+        </div>
+      </div>
+    </div>
+
     <div class="text-center mt-4">
       <a class="btn btn-brand btn-lg mt-3" href="/download-report">
         <i class="bi bi-download me-2"></i>
         Download PDF Report
       </a>
-      <a href="/analyze" class="btn btn-outline-primary ms-2">
+      <a href="/analyze" class="btn btn-outline-primary ms-2 mt-3">
         <i class="bi bi-arrow-repeat"></i>
         Analyze Another Resume
       </a>
     </div>
   </div>
 </section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const btn = document.getElementById("btn-ai-improve");
+  if (!btn) return;
+
+  btn.addEventListener("click", function () {
+    const spinner = document.getElementById("ai-loading-spinner");
+    const errorAlert = document.getElementById("ai-error-alert");
+    const errorText = document.getElementById("ai-error-text");
+    const resultsContainer = document.getElementById("ai-results-container");
+
+    btn.disabled = true;
+    spinner.classList.remove("d-none");
+    errorAlert.classList.add("d-none");
+    resultsContainer.classList.add("d-none");
+
+    const sampleBullets = [
+      "Developed web applications using Python and Flask framework.",
+      "Worked on database queries and API integration for software projects.",
+      "Collaborated with team members to deliver features and fix software bugs."
+    ].join("\n");
+
+    fetch("/api/ai/improve", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        resume_text: sampleBullets,
+        job_description: document.body.innerText.substring(0, 1000),
+        missing_skills: {{ missing | tojson }}
+      })
+    })
+    .then(res => {
+      return res.json().then(data => ({ status: res.status, data }));
+    })
+    .then(({ status, data }) => {
+      spinner.classList.add("d-none");
+      btn.disabled = false;
+
+      if (status !== 200 || data.error) {
+        errorText.innerText = data.error || "AI service is currently unavailable.";
+        errorAlert.classList.remove("d-none");
+        return;
+      }
+
+      if (data.improvements && data.improvements.length > 0) {
+        let html = '<div class="row g-3">';
+        data.improvements.forEach(item => {
+          html += `
+            <div class="col-12">
+              <div class="border rounded p-3 bg-light">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="badge bg-secondary">Original Bullet</span>
+                  <span class="badge bg-info text-dark">Impact: ${item.impact_level || 'High'}</span>
+                </div>
+                <p class="text-muted small mb-3">"${item.original}"</p>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="badge bg-success">ATS Optimized Bullet</span>
+                </div>
+                <p class="fw-semibold text-dark mb-2">"${item.improved}"</p>
+                <p class="small text-muted mb-2"><strong>Why it's better:</strong> ${item.reason}</p>
+                ${item.keywords_added && item.keywords_added.length > 0 ? `<div class="mt-2"><small class="text-muted">Keywords Added: </small>${item.keywords_added.map(k => `<span class="badge bg-white text-dark border me-1">${k}</span>`).join('')}</div>` : ''}
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+        resultsContainer.innerHTML = html;
+        resultsContainer.classList.remove("d-none");
+      } else {
+        errorText.innerText = "No bullet points could be extracted for AI optimization.";
+        errorAlert.classList.remove("d-none");
+      }
+    })
+    .catch(err => {
+      spinner.classList.add("d-none");
+      btn.disabled = false;
+      errorText.innerText = "Network error connecting to AI service.";
+      errorAlert.classList.remove("d-none");
+    });
+  });
+
+  const btnJd = document.getElementById("btn-ai-parse-jd");
+  if (btnJd) {
+    btnJd.addEventListener("click", function () {
+      const spinnerJd = document.getElementById("ai-jd-loading-spinner");
+      const errorAlertJd = document.getElementById("ai-jd-error-alert");
+      const errorTextJd = document.getElementById("ai-jd-error-text");
+      const resultsContainerJd = document.getElementById("ai-jd-results-container");
+
+      btnJd.disabled = true;
+      spinnerJd.classList.remove("d-none");
+      errorAlertJd.classList.add("d-none");
+      resultsContainerJd.classList.add("d-none");
+
+      fetch("/api/ai/parse-jd", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          job_description: document.body.innerText.substring(0, 1500)
+        })
+      })
+      .then(res => res.json().then(data => ({ status: res.status, data })))
+      .then(({ status, data }) => {
+        spinnerJd.classList.add("d-none");
+        btnJd.disabled = false;
+
+        if (status !== 200 || !data.success) {
+          errorTextJd.innerText = data.error || "Unable to semantically parse job description.";
+          errorAlertJd.classList.remove("d-none");
+          return;
+        }
+
+        const a = data.analysis;
+        let html = `
+          <div class="bg-light border rounded p-3">
+            <h5 class="fw-bold mb-3">📋 Role: ${a.job_title || 'Software Engineering Role'}</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <h6 class="fw-semibold">Required Skills</h6>
+                <div>${(a.required_skills && a.required_skills.length) ? a.required_skills.map(s => `<span class="badge bg-primary me-1 mb-1">${typeof s === 'object' ? (s.skill || JSON.stringify(s)) : s}</span>`).join('') : '<span class="text-muted small">None specified</span>'}</div>
+              </div>
+              <div class="col-md-6">
+                <h6 class="fw-semibold">Preferred / Nice-to-Have Skills</h6>
+                <div>${(a.preferred_skills && a.preferred_skills.length) ? a.preferred_skills.map(s => `<span class="badge bg-secondary me-1 mb-1">${typeof s === 'object' ? (s.skill || JSON.stringify(s)) : s}</span>`).join('') : '<span class="text-muted small">None specified</span>'}</div>
+              </div>
+              <div class="col-md-6">
+                <h6 class="fw-semibold">Tools & Platforms</h6>
+                <div>${(a.tools_and_platforms && a.tools_and_platforms.length) ? a.tools_and_platforms.map(t => `<span class="badge bg-dark me-1 mb-1">${t}</span>`).join('') : '<span class="text-muted small">None specified</span>'}</div>
+              </div>
+              <div class="col-md-6">
+                <h6 class="fw-semibold">Alternative OR Requirements</h6>
+                <div>${(a.alternative_requirements && a.alternative_requirements.length) ? a.alternative_requirements.map(alt => `<span class="badge bg-info text-dark me-1 mb-1">${(alt.group || alt).join(' OR ')}</span>`).join('') : '<span class="text-muted small">None specified</span>'}</div>
+              </div>
+              <div class="col-12">
+                <h6 class="fw-semibold">Experience & Education Requirements</h6>
+                <p class="small text-muted mb-0">
+                  ${(a.experience_requirements && a.experience_requirements.length) ? a.experience_requirements.map(e => e.requirement || e).join(' • ') : 'Standard experience'} |
+                  ${(a.education_requirements && a.education_requirements.length) ? a.education_requirements.join(' • ') : 'Bachelor degree'}
+                </p>
+              </div>
+            </div>
+          </div>
+        `;
+        resultsContainerJd.innerHTML = html;
+        resultsContainerJd.classList.remove("d-none");
+      })
+      .catch(err => {
+        spinnerJd.classList.add("d-none");
+        btnJd.disabled = false;
+        errorTextJd.innerText = "Network error connecting to AI service.";
+        errorAlertJd.classList.remove("d-none");
+      });
+    });
+  }
+});
+</script>
 {% endif %} {% endblock %}

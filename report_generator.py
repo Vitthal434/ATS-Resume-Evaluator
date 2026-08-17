@@ -67,6 +67,40 @@ def _add_list_items(story, items, empty_message, marker, styles):
         story.append(Paragraph(empty_message, styles["Normal"]))
 
 
+def format_skill(skill):
+    if not skill:
+        return ""
+    if " or " in skill:
+        return " or ".join(format_skill(part) for part in skill.split(" or "))
+    mapping = {
+        "aws": "AWS",
+        "gcp": "GCP",
+        "api": "API",
+        "rest api": "REST API",
+        "html": "HTML",
+        "css": "CSS",
+        "sql": "SQL",
+        "mysql": "MySQL",
+        "postgresql": "PostgreSQL",
+        "github": "GitHub",
+        "git": "Git",
+        "oop": "OOP",
+        "dsa": "DSA",
+        "nlp": "NLP",
+        "natural language processing": "Natural Language Processing",
+        "ai": "AI",
+        "ml": "ML",
+        "c++": "C++",
+        "power bi": "Power BI",
+        "javascript": "JavaScript",
+        "typescript": "TypeScript",
+        "react.js": "React.js",
+        "vue.js": "Vue.js",
+        "node.js": "Node.js",
+    }
+    return mapping.get(skill.lower(), skill.title())
+
+
 def generate_report(
     score,
     category,
@@ -82,6 +116,9 @@ def generate_report(
     Generate the ATS analysis PDF and return its file path.
     """
     os.makedirs("reports", exist_ok=True)
+
+    formatted_matched = [format_skill(s) for s in (matched or [])]
+    formatted_missing = [format_skill(s) for s in (missing or [])]
 
     pdf = SimpleDocTemplate(
         REPORT_FILE_PATH,
@@ -132,10 +169,10 @@ def generate_report(
     )
 
     _add_section_title(story, "Matched Skills", styles)
-    _add_list_items(story, matched, "No matched skills found.", "+", styles)
+    _add_list_items(story, formatted_matched, "No matched skills found.", "+", styles)
 
     _add_section_title(story, "Missing Skills", styles)
-    _add_list_items(story, missing, "No missing skills.", "-", styles)
+    _add_list_items(story, formatted_missing, "No missing skills.", "-", styles)
 
     _add_section_title(story, "Suggestions", styles)
     _add_list_items(story, suggestions, "No suggestions available.", "-", styles)

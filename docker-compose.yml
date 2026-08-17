@@ -1,0 +1,12 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: resumeiq-app
+    ports:
+      - "5000:5000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-resumeiq-default-dev-key}
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

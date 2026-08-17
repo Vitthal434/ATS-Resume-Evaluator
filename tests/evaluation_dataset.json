@@ -1,0 +1,141 @@
+{
+  "description": "ResumeIQ Stage 6.3 Synthetic Evaluation Benchmark Dataset",
+  "version": "1.0",
+  "test_cases": [
+    {
+      "id": "case_01_frontend_strong",
+      "domain": "frontend",
+      "match_type": "strong",
+      "resume": "Senior Frontend Developer with 6 years experience in JavaScript, TypeScript, React.js, Next.js, HTML, CSS, Jest, Webpack, Git, and REST API.",
+      "job_description": "Senior Frontend Engineer. Required: JavaScript, TypeScript, React.js, HTML, CSS. Preferred: Next.js, Jest, Webpack, Git. 5+ years experience required.",
+      "expected_min_score": 75.0,
+      "expected_max_score": 100.0
+    },
+    {
+      "id": "case_02_backend_strong",
+      "domain": "backend",
+      "match_type": "strong",
+      "resume": "Backend Engineer with 5 years experience building scalable microservices using Python, Django, FastAPI, PostgreSQL, Redis, Docker, and REST API.",
+      "job_description": "Senior Backend Engineer. Required: Python, Django or FastAPI, PostgreSQL, Redis, Docker, REST API. 4+ years experience required.",
+      "expected_min_score": 75.0,
+      "expected_max_score": 100.0
+    },
+    {
+      "id": "case_03_fullstack_moderate",
+      "domain": "fullstack",
+      "match_type": "moderate",
+      "resume": "Full Stack Developer with 3 years experience building applications using Python, JavaScript, React.js, PostgreSQL, and Git.",
+      "job_description": "Full Stack Engineer. Required: Python, JavaScript, React.js, Node.js, PostgreSQL, Docker, AWS. 3+ years experience.",
+      "expected_min_score": 50.0,
+      "expected_max_score": 85.0
+    },
+    {
+      "id": "case_04_datascience_strong",
+      "domain": "data_science_ml",
+      "match_type": "strong",
+      "resume": "Machine Learning Engineer with 4 years experience in Python, PyTorch, Scikit-Learn, TensorFlow, Natural Language Processing, BERT, and Docker.",
+      "job_description": "AI / ML Engineer. Required: Python, PyTorch, Machine Learning, Natural Language Processing. Preferred: Scikit-Learn, Docker, Transformers. 3+ years experience.",
+      "expected_min_score": 75.0,
+      "expected_max_score": 100.0
+    },
+    {
+      "id": "case_05_devops_strong",
+      "domain": "devops_cloud",
+      "match_type": "strong",
+      "resume": "DevOps Engineer with 5 years experience managing cloud infrastructure with AWS, Docker, Kubernetes, Terraform, Linux, and CI/CD pipelines.",
+      "job_description": "Cloud DevOps Engineer. Required: AWS, Docker, Kubernetes, Terraform, Linux. Preferred: CI/CD, Git. 4+ years experience required.",
+      "expected_min_score": 75.0,
+      "expected_max_score": 100.0
+    },
+    {
+      "id": "case_06_cybersecurity_moderate",
+      "domain": "cybersecurity",
+      "match_type": "moderate",
+      "resume": "Cyber Security Analyst with 3 years experience in Network Security, Penetration Testing, OWASP, Linux, and Python scripting.",
+      "job_description": "Application Security Engineer. Required: Security, Penetration Testing, OWASP, Python, Docker. Preferred: AWS. 3+ years experience.",
+      "expected_min_score": 40.0,
+      "expected_max_score": 85.0
+    },
+    {
+      "id": "case_07_mobile_moderate",
+      "domain": "mobile",
+      "match_type": "moderate",
+      "resume": "Mobile Application Developer with 3 years experience in React Native, JavaScript, TypeScript, iOS, Android, and REST API.",
+      "job_description": "Senior Mobile Developer. Required: React Native, Swift, Kotlin, iOS, Android, REST API. 4+ years experience.",
+      "expected_min_score": 45.0,
+      "expected_max_score": 85.0
+    },
+    {
+      "id": "case_08_qa_testing_moderate",
+      "domain": "qa_testing",
+      "match_type": "moderate",
+      "resume": "QA Test Engineer with 4 years experience in Software Testing, Automated Testing, Selenium, Python, Jest, and Git.",
+      "job_description": "QA Automation Engineer. Required: Testing, Selenium, Cypress, Python, Git. Preferred: Jest, CI/CD. 3+ years experience.",
+      "expected_min_score": 50.0,
+      "expected_max_score": 85.0
+    },
+    {
+      "id": "case_09_unrelated_construction",
+      "domain": "unrelated",
+      "match_type": "unrelated",
+      "resume": "Senior Construction Project Manager with 10 years experience in site safety, blueprint analysis, concrete foundations, and team management.",
+      "job_description": "Senior Frontend Engineer. Required: JavaScript, TypeScript, React.js, HTML, CSS. Preferred: Jest, Webpack, Git. 5+ years experience.",
+      "expected_min_score": 0.0,
+      "expected_max_score": 35.0
+    },
+    {
+      "id": "case_10_skills_only",
+      "domain": "frontend",
+      "match_type": "skills_only",
+      "resume": "Skills: JavaScript, TypeScript, React.js, HTML, CSS, Git, Webpack, REST API.",
+      "job_description": "Frontend Web Developer needed to build high-performance user interfaces. Required: JavaScript, TypeScript, React.js, HTML, CSS. Preferred: Git. 3+ years experience required.",
+      "expected_min_score": 35.0,
+      "expected_max_score": 75.0
+    },
+    {
+      "id": "case_11_experience_mismatch",
+      "domain": "backend",
+      "match_type": "experience_mismatch",
+      "resume": "Junior Backend Developer with 6 months experience in Python, Flask, PostgreSQL, and Git.",
+      "job_description": "Principal Lead Backend Architect. Required: Python, Flask, PostgreSQL, Architecture. Minimum 10 years experience required.",
+      "expected_min_score": 20.0,
+      "expected_max_score": 65.0
+    },
+    {
+      "id": "case_12_education_mismatch",
+      "domain": "backend",
+      "match_type": "education_mismatch",
+      "resume": "Self-taught Python Backend Developer with 4 years experience building web APIs using Python, Flask, PostgreSQL, and Docker. High school graduate.",
+      "job_description": "Senior Research Software Engineer. Required: Python, PostgreSQL, Docker. Master degree or PhD in Computer Science required.",
+      "expected_min_score": 40.0,
+      "expected_max_score": 85.0
+    },
+    {
+      "id": "case_13_or_alternative_skills",
+      "domain": "cloud",
+      "match_type": "or_alternative",
+      "resume": "Cloud Infrastructure Engineer with 4 years experience in GCP, Docker, Kubernetes, Python, and Terraform.",
+      "job_description": "Cloud Engineer. Required: AWS or GCP, Docker, Kubernetes, Python, Terraform. 3+ years experience required.",
+      "expected_min_score": 70.0,
+      "expected_max_score": 100.0
+    },
+    {
+      "id": "case_14_missing_critical_skills",
+      "domain": "backend",
+      "match_type": "missing_critical",
+      "resume": "Software Developer with 4 years experience in HTML, CSS, Git, and Technical Writing.",
+      "job_description": "Database Administrator & Backend Engineer. Required: PostgreSQL, MySQL, Redis, Python, Django. Minimum 3 years experience required.",
+      "expected_min_score": 0.0,
+      "expected_max_score": 35.0
+    },
+    {
+      "id": "case_15_empty_resume",
+      "domain": "edge_case",
+      "match_type": "empty_input",
+      "resume": "",
+      "job_description": "Senior Frontend Engineer. Required: React.js, JavaScript, HTML, CSS.",
+      "expected_min_score": 0.0,
+      "expected_max_score": 0.0
+    }
+  ]
+}
