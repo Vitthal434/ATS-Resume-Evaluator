@@ -378,6 +378,104 @@
       </div>
     </div>
 
+    {% if gap_analysis %}
+    <!-- Resume-Job Gap Analysis Card -->
+    <div class="card dashboard-card mt-4" id="gap-analysis-section">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+          <div>
+            <h4 class="section-title mb-1">🎯 Resume–Job Gap Analysis</h4>
+            <p class="text-muted mb-0">Deterministic breakdown of exact matches, transferable skills, critical missing requirements, and recommended priorities.</p>
+          </div>
+          <span class="badge bg-primary fs-6 px-3 py-2">
+            Coverage: {{ gap_analysis.skill_coverage.coverage_percentage }}%
+          </span>
+        </div>
+
+        <!-- Coverage Stats Pills -->
+        <div class="row g-3 text-center mb-4">
+          <div class="col-md-4">
+            <div class="p-3 bg-light border rounded">
+              <h3 class="fw-bold text-success mb-1">{{ gap_analysis.skill_coverage.exact_matches }}</h3>
+              <span class="badge bg-success">Exact Matches</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3 bg-light border rounded">
+              <h3 class="fw-bold text-warning mb-1">{{ gap_analysis.skill_coverage.partial_matches }}</h3>
+              <span class="badge bg-warning text-dark">Partial / Transferable</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3 bg-light border rounded">
+              <h3 class="fw-bold text-danger mb-1">{{ gap_analysis.skill_coverage.missing }}</h3>
+              <span class="badge bg-danger">Missing Requirements</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <!-- Partial Matches -->
+          {% if gap_analysis.partial_matches %}
+          <div class="col-md-6">
+            <h6 class="fw-bold text-dark mb-2">⚡ Partial / Transferable Skills</h6>
+            <ul class="list-group list-group-flush border rounded">
+              {% for item in gap_analysis.partial_matches %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong class="text-capitalize">{{ item.required_skill }}</strong>
+                  <div class="small text-muted">Covered by {{ item.candidate_skill }} (50% credit)</div>
+                </div>
+                <span class="badge bg-warning text-dark">{{ item.priority }}</span>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+
+          <!-- Critical Missing Skills -->
+          {% if gap_analysis.missing_skills %}
+          <div class="col-md-{% if gap_analysis.partial_matches %}6{% else %}12{% endif %}">
+            <h6 class="fw-bold text-dark mb-2">🚨 Missing Requirements & Priorities</h6>
+            <ul class="list-group list-group-flush border rounded">
+              {% for item in gap_analysis.missing_skills %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong class="text-capitalize">{{ item.skill }}</strong>
+                  <div class="small text-muted">{{ item.category | title }} requirement</div>
+                </div>
+                <span class="badge {% if item.priority == 'CRITICAL' %}bg-danger{% elif item.priority == 'HIGH' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                  {{ item.priority }}
+                </span>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Priority Recommendations -->
+        {% if gap_analysis.recommendations %}
+        <div class="mt-4">
+          <h6 class="fw-bold mb-2">💡 Recommended Priority Action Items</h6>
+          <div class="row g-2">
+            {% for rec in gap_analysis.recommendations %}
+            <div class="col-12">
+              <div class="p-2 border rounded bg-white d-flex align-items-center gap-2">
+                <span class="badge {% if rec.priority == 'CRITICAL' %}bg-danger{% elif rec.priority == 'HIGH' %}bg-warning text-dark{% else %}bg-secondary{% endif %} me-2">
+                  {{ rec.priority }}
+                </span>
+                <span class="small text-dark">{{ rec.reason }}</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
     <div class="card dashboard-card mt-5" id="ai-improvement-section">
       <div class="card-body p-4">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">

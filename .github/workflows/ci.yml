@@ -69,6 +69,11 @@ jobs:
           SECRET_KEY: ci-test-secret
         run: python tests/test_partial_skill_matching.py
 
+      - name: Run Intelligent Resume-Job Gap Analysis Unit Tests
+        env:
+          SECRET_KEY: ci-test-secret
+        run: python tests/test_gap_analysis.py
+
   docker-build:
     name: Build Docker Container Image
     needs: test
