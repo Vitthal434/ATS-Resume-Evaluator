@@ -2,12 +2,20 @@ import re
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from functools import lru_cache
+from sentence_transformers import SentenceTransformer
 
 SKILL_WEIGHT = 0.50
 TEXT_WEIGHT = 0.30
 EXPERIENCE_WEIGHT = 0.20
 
-from skills import SKILL_DATABASE
+
+@lru_cache(maxsize=1)
+def get_semantic_model():
+    return SentenceTransformer("all-MiniLM-L6-v2")
+
+
+from skills import ALIAS_INDEX, SKILL_DATABASE
 
 
 def preprocess(text):
@@ -59,6 +67,16 @@ OPTIONAL_HEADERS = [
     "additional qualifications",
 ]
 
+RESPONSIBILITY_HEADERS = [
+    "responsibilities",
+    "responsibility",
+    "what you will do",
+    "what you'll do",
+    "role responsibilities",
+    "key responsibilities",
+    "duties",
+]
+
 EXPERIENCE_PATTERNS = [
     r"(\d+)\+?\s*years?\s+(?:of\s+)?(?:professional\s+)?experience",
     r"(\d+)\+?\s*years?\s+(?:of\s+)?experience",
@@ -85,6 +103,44 @@ EDUCATION_KEYWORDS = [
 ]
 
 
+def _skill_match_pattern(value):
+    """Build a skill boundary pattern that avoids matching aliases inside skills."""
+    return r"(?<![a-zA-Z0-9+#-])" + re.escape(value) + r"(?![a-zA-Z0-9+#-])"
+
+
+def _iter_skill_variants():
+    """Yield canonical skills and their unambiguous aliases."""
+    for canonical_skill, metadata in SKILL_DATABASE.items():
+        yield canonical_skill, canonical_skill
+
+        for alias in metadata.get("aliases", []):
+            if ALIAS_INDEX.get(alias) == [canonical_skill]:
+                yield alias, canonical_skill
+
+
+def _resolve_overlapping_mentions(mentions):
+    """Prefer the longest canonical/alias match when skill mentions overlap."""
+    resolved = []
+
+    for mention in sorted(
+        mentions,
+        key=lambda item: (item[0], -(item[1] - item[0]), item[2]),
+    ):
+        start, end, skill = mention
+
+        overlaps_existing = any(
+            start < existing_end and end > existing_start
+            for existing_start, existing_end, _ in resolved
+        )
+
+        if overlaps_existing:
+            continue
+
+        resolved.append((start, end, skill))
+
+    return sorted(resolved)
+
+
 def extract_skills(text):
     """
     Extract canonical skills from text using
@@ -92,35 +148,20 @@ def extract_skills(text):
     """
 
     normalized_text = preprocess(text)
-    found_skills = set()
+    mentions = []
 
-    for canonical_skill, metadata in SKILL_DATABASE.items():
+    for variant, canonical_skill in _iter_skill_variants():
+        normalized_variant = preprocess(variant)
 
-        # Normalize canonical skill
-        canonical_normalized = preprocess(canonical_skill)
-
-        # Match canonical skill
-        pattern = r"(?<!\w)" + re.escape(canonical_normalized) + r"(?!\w)"
-
-        if re.search(pattern, normalized_text):
-            found_skills.add(canonical_skill)
+        if not normalized_variant:
             continue
 
-        # Match aliases
-        for alias in metadata.get("aliases", []):
+        pattern = _skill_match_pattern(normalized_variant)
 
-            alias_normalized = preprocess(alias)
+        for match in re.finditer(pattern, normalized_text):
+            mentions.append((match.start(), match.end(), canonical_skill))
 
-            if not alias_normalized:
-                continue
-
-            pattern = r"(?<!\w)" + re.escape(alias_normalized) + r"(?!\w)"
-
-            if re.search(pattern, normalized_text):
-                found_skills.add(canonical_skill)
-                break
-
-    return found_skills
+    return {skill for _, _, skill in _resolve_overlapping_mentions(mentions)}
 
 
 def _structure_normalize(text):
@@ -140,63 +181,54 @@ def _structure_normalize(text):
 
 
 def _find_skill_mentions(text):
-    """Find canonical skills and their positions in the original text."""
+    """Find canonical skills and their positions in the normalized text."""
 
     normalized_text = _structure_normalize(text)
 
-    mentions = {}
+    mentions = []
 
-    for canonical_skill, metadata in SKILL_DATABASE.items():
+    for variant, canonical_skill in _iter_skill_variants():
+        normalized_variant = _structure_normalize(variant)
 
-        variants = [canonical_skill, *metadata.get("aliases", [])]
+        if not normalized_variant:
+            continue
 
-        for variant in variants:
+        pattern = _skill_match_pattern(normalized_variant)
 
-            variant = _structure_normalize(variant)
+        for match in re.finditer(pattern, normalized_text):
+            # Ignore skills that are inside parentheses.
+            #
+            # Example:
+            # Node.js (TypeScript) or Go
+            #
+            # TypeScript is descriptive information about Node.js,
+            # not another OR alternative.
+            before = normalized_text[: match.start()]
 
-            if not variant:
+            if before.count("(") > before.count(")"):
                 continue
 
-            pattern = r"(?<!\w)" + re.escape(variant) + r"(?!\w)"
+            mentions.append((match.start(), match.end(), canonical_skill))
 
-            for match in re.finditer(pattern, normalized_text):
-
-                # Ignore skills mentioned inside parentheses.
-                # Example:
-                # Node.js (TypeScript) or Go
-                if normalized_text[: match.start()].count("(") > normalized_text[
-                    : match.start()
-                ].count(")"):
-                    continue
-
-                key = (match.start(), match.end())
-
-                current = mentions.get(key)
-
-                if current is None or len(variant) > current[0]:
-                    mentions[key] = (len(variant), canonical_skill)
-
-    results = [(start, end, value[1]) for (start, end), value in mentions.items()]
-
-    return sorted(results), normalized_text
+    return _resolve_overlapping_mentions(mentions), normalized_text
 
 
 def extract_alternative_requirements(text):
     """
-    Detect OR / alternative skill requirements.
+    Detect alternative skill requirements.
 
     Examples:
-
         Python or Go
         AWS or GCP
         Node.js, TypeScript, Go, or Python
         Python / Go
+        Node.js (TypeScript) or Go
+        Terraform or CloudFormation
     """
 
     alternatives = []
 
-    # Keep sentence boundaries so unrelated requirements
-    # are not accidentally merged.
+    # Keep sentence / bullet boundaries separate.
     segments = re.split(r"(?<=[.!?])\s+|[;\n]+", text)
 
     for segment in segments:
@@ -213,18 +245,19 @@ def extract_alternative_requirements(text):
 
             between = normalized_text[previous[1] : current[0]]
 
-            # Detect explicit OR or slash alternatives.
+            # Explicit OR or slash.
             if not re.search(r"\bor\b|/", between):
                 continue
 
             group = {previous[2], current[2]}
 
-            # Extend:
+            # -------------------------------------------------
+            # Extend backwards for:
             #
             # Python, TypeScript, Go, or Rust
             #
-            # from {Go, Rust}
-            # to {Python, TypeScript, Go, Rust}
+            # Node.js, TypeScript, Go or Python
+            # -------------------------------------------------
 
             backward = index - 1
 
@@ -234,21 +267,40 @@ def extract_alternative_requirements(text):
                     mentions[backward - 1][1] : mentions[backward][0]
                 ]
 
-                # Don't cross parentheses.
-                if "(" in separator or ")" in separator:
-                    break
-
-                # Only extend across list separators.
-                if not re.fullmatch(r"[\s,;/\-]+", separator):
+                if not re.fullmatch(r"[\s,;/\-()]+", separator):
                     break
 
                 group.add(mentions[backward - 1][2])
 
                 backward -= 1
 
+            # -------------------------------------------------
+            # Extend forward for cases such as:
+            #
+            # Python or Go or Rust
+            # -------------------------------------------------
+
+            forward = index + 1
+
+            while forward < len(mentions):
+
+                separator = normalized_text[
+                    mentions[forward - 1][1] : mentions[forward][0]
+                ]
+
+                if not re.fullmatch(r"[\s,;/\-()]+", separator):
+                    break
+
+                group.add(mentions[forward][2])
+
+                forward += 1
+
             alternatives.append(frozenset(group))
 
-    # Remove duplicate / overlapping groups.
+    # ---------------------------------------------------------
+    # Remove duplicate / overlapping alternatives
+    # ---------------------------------------------------------
+
     unique = []
 
     for group in alternatives:
@@ -271,6 +323,26 @@ def extract_alternative_requirements(text):
             unique.append(group)
 
     return unique
+
+
+def _extract_parenthetical_or_skills(text):
+    """Find skills inside parentheses within OR requirement segments."""
+    ignored_skills = set()
+    segments = re.split(r"(?<=[.!?])\s+|[;\n]+", text)
+
+    for segment in segments:
+        if not re.search(r"\bor\b|/", segment):
+            continue
+
+        for parenthetical_text in re.findall(r"\(([^)]*)\)", segment):
+            ignored_skills.update(extract_skills(parenthetical_text))
+
+    return ignored_skills
+
+
+def _extract_job_section_skills(text):
+    """Extract JD skills without treating OR parentheticals as requirements."""
+    return extract_skills(text) - _extract_parenthetical_or_skills(text)
 
 
 def extract_experience_requirements(text):
@@ -305,94 +377,101 @@ def extract_education_requirements(text):
 
     return sorted(found)
 
+
+def _find_section_ranges(text):
+    """Find JD section ranges for required, optional, and responsibility text."""
+    section_headers = {
+        "required": REQUIRED_HEADERS,
+        "optional": OPTIONAL_HEADERS,
+        "responsibilities": RESPONSIBILITY_HEADERS,
+    }
+    matches = []
+
+    for section_name, headers in section_headers.items():
+        for header in headers:
+            for match in re.finditer(_skill_match_pattern(header), text):
+                matches.append(
+                    {
+                        "section": section_name,
+                        "start": match.start(),
+                        "end": match.end(),
+                        "header": header,
+                    }
+                )
+
+    matches.sort(key=lambda item: (item["start"], -(item["end"] - item["start"])))
+
+    deduplicated = []
+    seen_starts = set()
+
+    for match in matches:
+        if match["start"] in seen_starts:
+            continue
+
+        deduplicated.append(match)
+        seen_starts.add(match["start"])
+
+    sections = {
+        "general": text[: deduplicated[0]["start"]] if deduplicated else text,
+        "required": "",
+        "optional": "",
+        "responsibilities": "",
+    }
+
+    for index, match in enumerate(deduplicated):
+        next_start = (
+            deduplicated[index + 1]["start"]
+            if index + 1 < len(deduplicated)
+            else len(text)
+        )
+        sections[match["section"]] += " " + text[match["end"] : next_start]
+
+    return sections
+
+
 def parse_job_description(job_text):
     """
     Parse a job description into structured requirements.
     """
 
-    text = preprocess(job_text)
+    text = _structure_normalize(job_text)
+    sections = _find_section_ranges(text)
 
-    # -----------------------------------------
-    # Locate optional section
-    # -----------------------------------------
-
-    optional_index = len(text)
-
-    for header in OPTIONAL_HEADERS:
-        index = text.find(header)
-
-        if index != -1:
-            optional_index = min(
-                optional_index,
-                index
-            )
-
-    # -----------------------------------------
-    # Locate required section
-    # -----------------------------------------
-
-    required_index = None
-
-    for header in REQUIRED_HEADERS:
-        index = text.find(header)
-
-        if index != -1:
-            if required_index is None:
-                required_index = index
-            else:
-                required_index = min(
-                    required_index,
-                    index
-                )
-
-    # -----------------------------------------
-    # Split sections
-    # -----------------------------------------
-
-    if required_index is not None:
-
-        general_text = text[:required_index]
-
-        required_text = text[
-            required_index:optional_index
-        ]
-
-    else:
-
-        general_text = text
-        required_text = ""
-
-    # -----------------------------------------
-    # Optional section
-    # -----------------------------------------
-
-    if optional_index < len(text):
-        optional_text = text[optional_index:]
-    else:
-        optional_text = ""
+    general_text = sections["general"]
+    required_text = sections["required"]
+    optional_text = sections["optional"]
+    responsibilities_text = sections["responsibilities"]
 
     # -----------------------------------------
     # Extract skills
     # -----------------------------------------
 
-    general_skills = extract_skills(
+    general_skills = _extract_job_section_skills(
         general_text
     )
 
-    required_skills = extract_skills(
+    required_skills = _extract_job_section_skills(
         required_text
     )
 
-    optional_skills = extract_skills(
+    optional_skills = _extract_job_section_skills(
         optional_text
     )
+
+    responsibility_skills = _extract_job_section_skills(
+        responsibilities_text
+    )
+
+    # Responsibilities are tracked separately and still count as
+    # general JD skills for the existing scoring model.
+    general_skills = general_skills | responsibility_skills
 
     # -----------------------------------------
     # If no explicit required section exists,
     # treat general skills as required.
     # -----------------------------------------
 
-    if required_index is None:
+    if not required_text:
         required_skills = set(general_skills)
 
     # -----------------------------------------
@@ -403,6 +482,7 @@ def parse_job_description(job_text):
         general_skills
         | required_skills
         | optional_skills
+        | responsibility_skills
     )
 
     # -----------------------------------------
@@ -427,9 +507,20 @@ def parse_job_description(job_text):
         )
     )
 
+    responsibility_alternatives = (
+        extract_alternative_requirements(
+            responsibilities_text
+        )
+    )
+
+    general_alternatives = (
+        general_alternatives
+        + responsibility_alternatives
+    )
+
     # If there is no explicit required section,
     # general alternatives are required.
-    if required_index is None:
+    if not required_text:
         required_alternatives = list(
             general_alternatives
         )
@@ -454,6 +545,8 @@ def parse_job_description(job_text):
         "general": general_skills,
         "required": required_skills,
         "optional": optional_skills,
+        "nice_to_have": optional_skills,
+        "responsibilities": responsibility_skills,
         "all": all_skills,
 
         "required_alternatives":
@@ -464,6 +557,9 @@ def parse_job_description(job_text):
 
         "general_alternatives":
             general_alternatives,
+
+        "responsibility_alternatives":
+            responsibility_alternatives,
 
         "alternatives":
             required_alternatives
@@ -606,13 +702,61 @@ def calculate_weighted_skill_score(
 
 
 def calculate_text_similarity(resume, job):
-    """Calculate TF-IDF cosine similarity between resume and job description."""
-    documents = [resume, job]
-    vectorizer = TfidfVectorizer(stop_words="english")
-    tfidf_matrix = vectorizer.fit_transform(documents)
-    similarity = cosine_similarity(tfidf_matrix[0], tfidf_matrix[1])[0][0]
+    """
+    Calculate hybrid semantic + lexical similarity between resume and job description.
+    """
 
-    return round(similarity * 100, 2)
+    resume = preprocess(resume)
+    job = preprocess(job)
+
+    if not resume or not job:
+        return 0.0
+
+    # -----------------------------------------
+    # 1. TF-IDF lexical similarity
+    # -----------------------------------------
+    vectorizer = TfidfVectorizer(
+        stop_words="english",
+        ngram_range=(1, 2),
+        sublinear_tf=True,
+    )
+
+    tfidf_matrix = vectorizer.fit_transform([resume, job])
+
+    tfidf_score = cosine_similarity(
+        tfidf_matrix[0],
+        tfidf_matrix[1],
+    )[
+        0
+    ][0]
+
+    # -----------------------------------------
+    # 2. Semantic similarity
+    # -----------------------------------------
+    model = get_semantic_model()
+
+    embeddings = model.encode(
+        [resume, job],
+        normalize_embeddings=True,
+        batch_size=2,
+        show_progress_bar=False,
+    )
+
+    semantic_score = cosine_similarity(
+        [embeddings[0]],
+        [embeddings[1]],
+    )[
+        0
+    ][0]
+
+    # -----------------------------------------
+    # 3. Hybrid score
+    # -----------------------------------------
+    hybrid_score = 0.70 * semantic_score + 0.30 * tfidf_score
+
+    hybrid_score = max(0.0, min(1.0, hybrid_score))
+
+    return round(hybrid_score * 100, 2)
 
 
 def calculate_skill_match(resume, job):
@@ -742,6 +886,8 @@ def calculate_skill_match(resume, job):
         general_alternatives,
     )
 
+    missing_skills = list(dict.fromkeys(missing_skills))
+
     return (
         skill_score,
         matched_skills,
@@ -761,6 +907,9 @@ def experience_score(resume):
     - internships
     - projects
     """
+
+    if not resume or not resume.strip():
+        return 0
 
     resume = resume.lower()
 
@@ -816,7 +965,7 @@ def final_match_score(resume, job):
         2,
     )
 
-    suggestions = []
+    suggestions = []    
 
     if missing_skills:
         suggestions.append("Consider adding these skills: " + ", ".join(missing_skills))
