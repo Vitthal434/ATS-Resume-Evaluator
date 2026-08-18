@@ -3,3 +3,9 @@ PyPDF2
 python-docx
 reportlab
 scikit-learn
+sentence-transformers
+waitress
+transformers>=4.40.0
+torch
+huggingface-hub>=0.21.0
+llama-cpp-python>=0.3.0

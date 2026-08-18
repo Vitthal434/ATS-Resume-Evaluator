@@ -1,6 +1,6 @@
-# Contributing
+# Contributing to ResumeIQ
 
-Thank you for your interest in contributing to ATS Resume Evaluator.
+Thank you for your interest in contributing to ResumeIQ (ATS Resume Evaluator).
 
 ## How to Contribute
 

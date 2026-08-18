@@ -1,75 +1,91 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
 
 <!-- ================= HERO SECTION ================= -->
-
-<section class="hero">
+<section class="hero-section">
   <div class="container">
     <div class="row align-items-center gy-5">
-      <!-- Left Side -->
-
+      <!-- Left Column: Hero Copy & CTA -->
       <div class="col-lg-6">
-        <span class="hero-badge"> AI Powered Resume Intelligence </span>
+        <span class="hero-badge">
+          <i class="bi bi-stars text-primary"></i> Resume Match Intelligence
+        </span>
 
-        <h1 class="hero-title mt-4">
-          Land More Interviews with
-          <span class="gradient-text">ResumeIQ</span>
+        <h1 class="hero-title">
+          Land More Interviews with <span class="gradient-text">ResumeIQ</span>
         </h1>
 
         <p class="hero-description">
-          ResumeIQ analyzes your resume against job descriptions, identifies
-          missing skills, calculates ATS compatibility, and provides actionable
-          recommendations to maximize your chances of getting shortlisted.
+          Transparent ATS evaluation, transferable skill detection, and actionable improvement roadmaps tailored to your target job descriptions.
         </p>
 
-        <div class="hero-buttons">
-          <a href="/analyze" class="btn btn-primary btn-lg hero-btn">
-            <i class="bi bi-stars me-2"></i>
-
-            Analyze Resume
+        <div class="hero-cta-group mb-4">
+          <a href="/analyze" class="btn btn-brand btn-lg">
+            <i class="bi bi-upload"></i> Analyze Resume Now
           </a>
-
-          <a href="#features" class="btn btn-light btn-lg hero-btn-secondary">
-            Learn More
+          <a href="#features" class="btn btn-brand-outline btn-lg">
+            <i class="bi bi-compass"></i> Explore Features
           </a>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 text-muted small">
+          <span><i class="bi bi-check-circle-fill text-success me-1"></i>Free to use</span>
+          <span><i class="bi bi-check-circle-fill text-success me-1"></i>Supports PDF & DOCX</span>
+          <span><i class="bi bi-check-circle-fill text-success me-1"></i>Downloadable PDF Reports</span>
         </div>
       </div>
 
-      <!-- Right Side -->
-
+      <!-- Right Column: Interactive Live Preview Card -->
       <div class="col-lg-6">
         <div class="preview-card">
           <div class="preview-header">
-            ResumeIQ Analysis
-
-            <span class="live-badge"> Live Demo </span>
+            <div>
+              <span class="text-uppercase small fw-bold text-muted d-block">Sample Report</span>
+              <span class="fw-bold text-dark fs-5">Senior Backend Engineer</span>
+            </div>
+            <span class="badge badge-success-subtle">
+              <i class="bi bi-patch-check-fill"></i> Live Preview
+            </span>
           </div>
 
-          <div class="preview-score">91%</div>
-
-          <div class="progress mb-4">
-            <div class="progress-bar bg-success" style="width: 91%"></div>
+          <div class="preview-score-wrapper">
+            <div class="preview-score">91.5%</div>
+            <span class="preview-score-tag">Excellent Fit</span>
           </div>
 
-          <p class="preview-text">Excellent ATS Compatibility</p>
+          <div class="preview-progress-track">
+            <div class="preview-progress-bar" style="width: 91.5%;"></div>
+          </div>
 
-          <hr />
+          <div class="preview-breakdown">
+            <div class="preview-breakdown-item">
+              <div class="preview-breakdown-val text-primary">94%</div>
+              <div class="preview-breakdown-lbl">Skill (50%)</div>
+            </div>
+            <div class="preview-breakdown-item">
+              <div class="preview-breakdown-val text-info">88%</div>
+              <div class="preview-breakdown-lbl">Text (30%)</div>
+            </div>
+            <div class="preview-breakdown-item">
+              <div class="preview-breakdown-val text-success">92%</div>
+              <div class="preview-breakdown-lbl">Exp (20%)</div>
+            </div>
+          </div>
 
-          <div class="preview-skills">
-            <span>Python</span>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="small fw-bold text-muted">Detected Skills & Keywords</span>
+            <span class="small text-success fw-semibold"><i class="bi bi-arrow-up-right"></i> 12 Matched</span>
+          </div>
 
-            <span>Flask</span>
-
-            <span>Git</span>
-
-            <span>Docker</span>
-
-            <span>REST API</span>
-
-            <span>AWS</span>
-
-            <span>MySQL</span>
-
-            <span>Problem Solving</span>
+          <div class="preview-skills-container">
+            <span class="preview-skill-chip">Python</span>
+            <span class="preview-skill-chip">FastAPI</span>
+            <span class="preview-skill-chip">PostgreSQL</span>
+            <span class="preview-skill-chip">Docker</span>
+            <span class="preview-skill-chip">AWS</span>
+            <span class="preview-skill-chip">Redis</span>
+            <span class="preview-skill-chip">CI/CD</span>
+            <span class="preview-skill-chip">REST API</span>
           </div>
         </div>
       </div>
@@ -77,104 +93,147 @@
   </div>
 </section>
 
-<!--=================================
-ResumeIQ Trust Section
-===================================-->
-
+<!-- ================= METHODOLOGY & ARCHITECTURE STATS ================= -->
 <section class="trust-section">
   <div class="container">
     <div class="row g-4">
-      <div class="col-md-3">
-        <div class="trust-card">
-          <h2>95%</h2>
-
-          <p>Average ATS Match Improvement</p>
+      <div class="col-6 col-md-3">
+        <div class="trust-stat-card">
+          <div class="trust-stat-num" style="font-size: 1.85rem;">50 · 30 · 20</div>
+          <p class="trust-stat-lbl">Transparent ATS Scoring</p>
+          <small class="text-muted d-block" style="font-size: 0.75rem;">Skills · Relevance · Experience</small>
         </div>
       </div>
-
-      <div class="col-md-3">
-        <div class="trust-card">
-          <h2>PDF</h2>
-
-          <p>Supports PDF & DOCX Resumes</p>
+      <div class="col-6 col-md-3">
+        <div class="trust-stat-card">
+          <div class="trust-stat-num" style="font-size: 1.85rem;">Deterministic</div>
+          <p class="trust-stat-lbl">AI-Optional Architecture</p>
+          <small class="text-muted d-block" style="font-size: 0.75rem;">Core math runs independently</small>
         </div>
       </div>
-
-      <div class="col-md-3">
-        <div class="trust-card">
-          <h2><10s</h2>
-
-          <p>Typical Resume Analysis Time</p>
+      <div class="col-6 col-md-3">
+        <div class="trust-stat-card">
+          <div class="trust-stat-num" style="font-size: 1.85rem;">Hybrid Model</div>
+          <p class="trust-stat-lbl">Fast Semantic Matching</p>
+          <small class="text-muted d-block" style="font-size: 0.75rem;">Embeddings + lexical overlap</small>
         </div>
       </div>
-
-      <div class="col-md-3">
-        <div class="trust-card">
-          <h2>AI</h2>
-
-          <p>Smart Skill Gap Detection</p>
+      <div class="col-6 col-md-3">
+        <div class="trust-stat-card">
+          <div class="trust-stat-num" style="font-size: 1.85rem;">PDF Export</div>
+          <p class="trust-stat-lbl">Professional Reports</p>
+          <small class="text-muted d-block" style="font-size: 0.75rem;">Executive multi-page format</small>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section id="features" class="py-5">
-  <div class="container">
-    <div class="row text-center mb-5">
-      <h2 class="fw-bold">Everything you need to optimize your resume</h2>
-
-      <p class="text-muted">AI-powered insights to help you stand out.</p>
+<!-- ================= CORE FEATURES ================= -->
+<section id="features" class="py-5 bg-app">
+  <div class="container py-4">
+    <div class="text-center max-w-700 mx-auto mb-5">
+      <span class="hero-badge mb-2">Engineered For Accuracy</span>
+      <h2 class="display-6 fw-bold mt-2">Comprehensive ATS Optimization Suite</h2>
+      <p class="text-muted">
+        Traditional ATS checkers rely on naive keyword counts. ResumeIQ pairs lexical precision with transformer embeddings for genuine semantic matching.
+      </p>
     </div>
 
     <div class="row g-4">
-      <div class="col-md-3">
-        <div class="card h-100 shadow-sm border-0">
-          <div class="card-body">
-            <i class="bi bi-graph-up-arrow fs-1 text-primary"></i>
-
-            <h5 class="mt-3">ATS Analysis</h5>
-
-            <p>Measure resume compatibility with modern ATS systems.</p>
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-card">
+          <div class="feature-icon-box feature-icon-blue">
+            <i class="bi bi-diagram-3-fill"></i>
           </div>
+          <h3 class="feature-title">Hybrid ATS Scoring</h3>
+          <p class="feature-text">
+            Weighted composite scoring balancing 50% Skill Match, 30% Semantic Text Similarity, and 20% Experience Relevance.
+          </p>
         </div>
       </div>
 
-      <div class="col-md-3">
-        <div class="card h-100 shadow-sm border-0">
-          <div class="card-body">
-            <i class="bi bi-stars fs-1 text-primary"></i>
-
-            <h5 class="mt-3">Skill Matching</h5>
-
-            <p>Identify strengths and missing skills instantly.</p>
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-card">
+          <div class="feature-icon-box feature-icon-green">
+            <i class="bi bi-arrows-angle-contract"></i>
           </div>
+          <h3 class="feature-title">Transferable Skills</h3>
+          <p class="feature-text">
+            Recognizes transferable domain competency (e.g. PostgreSQL &rarr; SQL) granting 50% partial credit without false positives.
+          </p>
         </div>
       </div>
 
-      <div class="col-md-3">
-        <div class="card h-100 shadow-sm border-0">
-          <div class="card-body">
-            <i class="bi bi-file-earmark-pdf fs-1 text-primary"></i>
-
-            <h5 class="mt-3">PDF Reports</h5>
-
-            <p>Generate downloadable ATS analysis reports.</p>
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-card">
+          <div class="feature-icon-box feature-icon-purple">
+            <i class="bi bi-signpost-split-fill"></i>
           </div>
+          <h3 class="feature-title">Prioritized Roadmap</h3>
+          <p class="feature-text">
+            Classifies missing qualifications into Immediate (HIGH), Next (MEDIUM), and Optional (LOW) priority tiers with estimated impact.
+          </p>
         </div>
       </div>
 
-      <div class="col-md-3">
-        <div class="card h-100 shadow-sm border-0">
-          <div class="card-body">
-            <i class="bi bi-briefcase fs-1 text-primary"></i>
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-card">
+          <div class="feature-icon-box feature-icon-amber">
+            <i class="bi bi-file-earmark-pdf-fill"></i>
+          </div>
+          <h3 class="feature-title">Professional PDF Reports</h3>
+          <p class="feature-text">
+            Instantly download a structured multi-page PDF report with branded score summaries, skill matrices, and actionable suggestions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-            <h5 class="mt-3">Job Suggestions</h5>
+<!-- ================= HOW IT WORKS ================= -->
+<section class="py-5 bg-white border-top border-bottom">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <span class="hero-badge mb-2">Simple 3-Step Process</span>
+      <h2 class="display-6 fw-bold mt-2">How ResumeIQ Works</h2>
+    </div>
 
-            <p>Discover relevant job roles based on your resume.</p>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="workflow-step">
+          <div class="workflow-num">1</div>
+          <div>
+            <h4 class="fw-bold fs-5 mb-2">Upload Resume</h4>
+            <p class="text-muted small mb-0">Drag and drop your PDF or DOCX resume. Text is parsed cleanly while safeguarding formatting.</p>
           </div>
         </div>
       </div>
+      <div class="col-md-4">
+        <div class="workflow-step">
+          <div class="workflow-num">2</div>
+          <div>
+            <h4 class="fw-bold fs-5 mb-2">Paste Job Description</h4>
+            <p class="text-muted small mb-0">Add the target JD text. The engine parses required skills, OR-groups, and experience requirements.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="workflow-step">
+          <div class="workflow-num">3</div>
+          <div>
+            <h4 class="fw-bold fs-5 mb-2">Get Actionable Report</h4>
+            <p class="text-muted small mb-0">Inspect your score breakdown, gap analysis, and tailored roadmap, or download your PDF summary.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-5">
+      <a href="/analyze" class="btn btn-brand btn-lg">
+        <i class="bi bi-arrow-right-circle me-1"></i> Start Your Analysis Now
+      </a>
     </div>
   </div>
 </section>

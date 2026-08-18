@@ -1,64 +1,302 @@
+/* ==========================================================================
+   ResumeIQ — Global Design System & Core Styles (Production SaaS)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap');
+
+:root {
+  /* Brand Palette */
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-deep: #1e3a8a;
+  --primary-light: #eff6ff;
+  --primary-subtle: #dbeafe;
+
+  --secondary: #6366f1;
+  --secondary-light: #eef2ff;
+
+  --accent-teal: #0ea5e9;
+  --accent-purple: #8b5cf6;
+
+  /* Status Colors */
+  --success: #16a34a;
+  --success-light: #dcfce7;
+  --success-text: #15803d;
+
+  --warning: #d97706;
+  --warning-light: #fef3c7;
+  --warning-text: #b45309;
+
+  --danger: #dc2626;
+  --danger-light: #fee2e2;
+  --danger-text: #b91c1c;
+
+  --info: #0284c7;
+  --info-light: #e0f2fe;
+  --info-text: #0369a1;
+
+  /* Neutrals & Surfaces */
+  --bg-app: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --bg-muted: #e2e8f0;
+
+  --text-main: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+
+  --border-color: #e2e8f0;
+  --border-focus: #93c5fd;
+
+  /* Elevations */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.08);
+  --shadow-xl: 0 20px 40px rgba(15, 23, 42, 0.10);
+  --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.25);
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Base Elements */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: "Poppins", sans-serif;
-  background: #f6f8fb;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.navbar-brand span,
-.text-brand {
-  color: #2563eb;
-}
-.btn-brand {
-  background: #2563eb;
-  border-color: #2563eb;
-  border-radius: 12px;
-  color: #ffffff;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 700;
-  padding: 0.9rem 1.25rem;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
 }
 
-.btn-brand:hover,
-.btn-brand:focus {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
-  color: #ffffff;
-}
-
-.footer {
-  background: #0f172a;
-
-  color: white;
-}
-
-.footer a {
-  color: #cbd5e1;
-  text-decoration: none;
+/* Gradient Utilities */
+.gradient-text {
+  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   display: inline-block;
-  transition:
-    color 0.3s ease,
-    transform 0.3s ease;
 }
 
-.footer a:hover {
+.gradient-bg {
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #4f46e5 100%);
   color: #ffffff;
-  transform: translateX(6px);
 }
 
-.footer .badge {
-  padding: 10px 14px;
-  font-size: 0.85rem;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+/* Top Navigation Bar */
+.navbar-custom {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-color);
+  transition: var(--transition-normal);
+  z-index: 1030;
 }
 
-.footer .badge:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
-}
-.footer hr {
-  border-color: #334155;
+.navbar-brand-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
 }
 
-.footer .text-muted {
-  color: #94a3b8 !important;
+.navbar-brand-text {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+  color: var(--text-main);
+}
+
+.nav-link-custom {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem !important;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.nav-link-custom:hover {
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+/* Primary SaaS Buttons */
+.btn-brand {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #ffffff !important;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.65rem 1.4rem;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+  transition: var(--transition-normal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.btn-brand:hover, .btn-brand:focus {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-deep) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+  color: #ffffff !important;
+}
+
+.btn-brand:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+.btn-brand-outline {
+  background: transparent;
+  color: var(--primary) !important;
+  border: 1.5px solid var(--primary);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.65rem 1.4rem;
+  transition: var(--transition-normal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.btn-brand-outline:hover {
+  background: var(--primary-light);
+  border-color: var(--primary-dark);
+  color: var(--primary-dark) !important;
+  transform: translateY(-2px);
+}
+
+/* SaaS Cards */
+.saas-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-normal);
+}
+
+.saas-card:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: #cbd5e1;
+}
+
+/* Badges & Pills */
+.badge-custom {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-success-subtle {
+  background: var(--success-light);
+  color: var(--success-text);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.badge-warning-subtle {
+  background: var(--warning-light);
+  color: var(--warning-text);
+  border: 1px solid rgba(217, 119, 6, 0.2);
+}
+
+.badge-danger-subtle {
+  background: var(--danger-light);
+  color: var(--danger-text);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.badge-info-subtle {
+  background: var(--info-light);
+  color: var(--info-text);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+}
+
+.badge-primary-subtle {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  border: 1px solid var(--primary-subtle);
+}
+
+/* Footer Styling */
+.footer-saas {
+  background: #090d16;
+  color: #e2e8f0;
+  border-top: 1px solid #1e293b;
+  position: relative;
+}
+
+.footer-saas a {
+  color: #94a3b8;
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.footer-saas a:hover {
+  color: #ffffff;
+  padding-left: 4px;
+}
+
+.footer-badge-tech {
+  background: rgba(30, 41, 59, 0.8);
+  color: #cbd5e1;
+  border: 1px solid #334155;
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: var(--transition-fast);
+}
+
+.footer-badge-tech:hover {
+  border-color: var(--primary);
+  color: #ffffff;
+  transform: translateY(-2px);
 }

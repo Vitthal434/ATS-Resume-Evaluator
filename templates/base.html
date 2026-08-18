@@ -3,13 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ResumeIQ</title>
+    <title>ResumeIQ — Transparent ATS Resume Evaluator & Roadmap</title>
+    <meta name="description" content="Evaluate your resume compatibility against job descriptions using deterministic ATS scoring, skill gap analysis, and tailored improvement roadmaps." />
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Bootstrap 5 & Icons -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -18,33 +23,25 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
       rel="stylesheet"
     />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/base.css') }}"
-    />
 
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/landing.css') }}"
-    />
-
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/dashboard.css') }}"
-    />
+    <!-- App CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
-      <div class="container py-2">
-        <a
-          class="navbar-brand fw-bold d-flex align-items-center gap-2"
-          href="/"
-        >
-          <i class="bi bi-stars text-brand"></i>
-          <span>ResumeIQ</span>
+    <!-- Top Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top py-2">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="/">
+          <div class="navbar-brand-badge">
+            <i class="bi bi-stars"></i>
+          </div>
+          <span class="navbar-brand-text">Resume<span class="text-primary">IQ</span></span>
         </a>
+
         <button
-          class="navbar-toggler"
+          class="navbar-toggler border-0 shadow-none"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#mainNavbar"
@@ -54,75 +51,96 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="mainNavbar">
-          <div class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
-            <a class="nav-link" href="/analyze">Analyze</a>
-            {% if score %}
-            <a class="nav-link" href="#report">Report</a>
+          <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2 my-2 my-lg-0">
+            <li class="nav-item">
+              <a class="nav-link nav-link-custom" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-link-custom" href="/analyze">
+                <i class="bi bi-upload me-1 text-primary"></i>Analyze
+              </a>
+            </li>
+            {% if score is defined and score is not none %}
+            <li class="nav-item">
+              <a class="nav-link nav-link-custom" href="#report">
+                <i class="bi bi-graph-up me-1 text-success"></i>Report
+              </a>
+            </li>
             {% endif %}
-            <a class="btn btn-brand btn-sm px-3" href="/analyze">
-              Get Started
-            </a>
-          </div>
+            <li class="nav-item ms-lg-2">
+              <a class="btn btn-brand btn-sm" href="/analyze">
+                <i class="bi bi-lightning-charge-fill me-1"></i>Get Started
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
     </nav>
 
-    <main>{% block content %} {% endblock %}</main>
-    <footer class="footer py-5 mt-5">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-5">
-            <h4 class="fw-bold gradient-text">ResumeIQ</h4>
+    <!-- Main Content Slot -->
+    <main>
+      {% block content %}{% endblock %}
+    </main>
 
-            <p class="text-muted mt-3">
-              AI-powered resume intelligence that helps job seekers improve ATS
-              compatibility, identify skill gaps, and prepare stronger
-              applications.
+    <!-- SaaS Footer -->
+    <footer class="footer-saas py-5 mt-5">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-5">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <div class="navbar-brand-badge" style="width: 32px; height: 32px; font-size: 1rem;">
+                <i class="bi bi-stars"></i>
+              </div>
+              <span class="fw-bold fs-4 text-white">Resume<span class="text-primary">IQ</span></span>
+            </div>
+            <p class="text-muted small pe-lg-4">
+              Resume intelligence platform featuring deterministic ATS scoring, transferable skill matching, and tailored career improvement roadmaps.
             </p>
+            <div class="d-flex align-items-center gap-3 text-muted small mt-3">
+              <span><i class="bi bi-shield-check text-success me-1"></i>Deterministic Scoring</span>
+              <span><i class="bi bi-person-check text-primary me-1"></i>Built by Vaibhav Pandey</span>
+            </div>
           </div>
 
-          <div class="col-lg-3">
-            <h5 class="fw-bold mb-3">Quick Links</h5>
-
-            <ul class="list-unstyled">
-              <li><a href="#features">Features</a></li>
-
-              <li><a href="/analyze">Analyze Resume</a></li>
-
-              {% if score %}
-              <li><a href="#report">Report</a></li>
+          <div class="col-6 col-lg-3">
+            <h6 class="fw-bold text-white text-uppercase small mb-3 letter-spacing-1">Navigation</h6>
+            <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+              <li><a href="/"><i class="bi bi-chevron-right me-1 text-primary"></i>Home Overview</a></li>
+              <li><a href="/#features"><i class="bi bi-chevron-right me-1 text-primary"></i>Core Features</a></li>
+              <li><a href="/analyze"><i class="bi bi-chevron-right me-1 text-primary"></i>Resume Analyzer</a></li>
+              {% if score is defined and score is not none %}
+              <li><a href="#report"><i class="bi bi-chevron-right me-1 text-primary"></i>Current Report</a></li>
               {% endif %}
             </ul>
           </div>
 
-          <div class="col-lg-4">
-            <h5 class="fw-bold mb-3">Built With</h5>
-
-            <div class="d-flex flex-wrap gap-2">
-              <span class="badge bg-primary">Flask</span>
-
-              <span class="badge bg-primary">Bootstrap</span>
-
-              <span class="badge bg-primary">JavaScript</span>
-
-              <span class="badge bg-primary">Python</span>
+          <div class="col-6 col-lg-4">
+            <h6 class="fw-bold text-white text-uppercase small mb-3 letter-spacing-1">Built With</h6>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <span class="footer-badge-tech"><i class="bi bi-filetype-py text-warning"></i>Python</span>
+              <span class="footer-badge-tech"><i class="bi bi-code-square text-info"></i>Flask</span>
+              <span class="footer-badge-tech"><i class="bi bi-cpu text-primary"></i>SentenceTransformers</span>
+              <span class="footer-badge-tech"><i class="bi bi-file-earmark-pdf text-danger"></i>ReportLab</span>
+              <span class="footer-badge-tech"><i class="bi bi-stars text-info"></i>Gemini</span>
             </div>
-
-            <p class="mt-4 text-muted">
-              Made by <strong>VAIBHAV PANDEY</strong>
+            <p class="text-muted small mb-0">
+              Scoring formula: <strong>50% Skill Match + 30% Text Similarity + 20% Experience</strong>.
             </p>
           </div>
         </div>
 
-        <hr class="my-4" />
+        <hr class="my-4" style="border-color: rgba(255, 255, 255, 0.1);" />
 
-        <p class="text-center text-muted mb-0">
-          © 2026 ResumeIQ. All Rights Reserved.
-        </p>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-muted small gap-2">
+          <span>&copy; 2026 ResumeIQ · Built by Vaibhav Pandey</span>
+          <span>Transparent deterministic ATS evaluation.</span>
+        </div>
       </div>
     </footer>
 
+    <!-- Bootstrap Bundle & App Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
   </body>

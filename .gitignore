@@ -1,17 +1,42 @@
+# Virtual Environments
 venv/
+resumeiq-venv/
+env/
+ENV/
+
+# Python Cache & Build
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
 
+# Uploads & Reports
 uploads/
+reports/
+*.log
 
+# Environment & Secrets
 .env
+.env.*
 
+# IDE & OS
 .idea/
-
 .vscode/
-
+*.swp
+*.swo
 .DS_Store
-
 Thumbs.db
 
-*.log
+# AI Models & Large Weights
+*.gguf
+*.bin
+*.safetensors
+models/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
