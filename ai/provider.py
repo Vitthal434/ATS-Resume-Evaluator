@@ -29,17 +29,17 @@ def is_ai_available() -> bool:
     """
     Return True if the configured AI provider's prerequisites are satisfied.
 
-    For 'local': returns True if torch and transformers are importable.
+    For 'local': returns True if torch/llama_cpp dependencies are present.
     For 'gemini': returns True if GEMINI_API_KEY environment variable is set.
+    For 'none'/'disabled': returns False immediately (useful for low-memory free-tier instances).
 
     This check does NOT load the model or make any network calls.
     It only confirms that the provider's dependencies are present.
-
-    Note: A True return from this function means the provider *can be attempted*,
-    not that inference will necessarily succeed. Model-load failures are surfaced
-    gracefully at inference time, not here.
     """
     provider = get_active_provider()
+
+    if provider in ("none", "disabled", "off"):
+        return False
 
     if provider == "gemini":
         from ai.gemini_provider import is_gemini_available
@@ -64,6 +64,9 @@ def call_ai(prompt: str, timeout: int = 60, max_tokens: Optional[int] = None) ->
     For local providers it is ignored.
     """
     provider = get_active_provider()
+
+    if provider in ("none", "disabled", "off"):
+        raise RuntimeError("AI service is disabled on this instance (AI_PROVIDER=none).")
 
     if provider == "gemini":
         from ai.gemini_provider import call_gemini_api
