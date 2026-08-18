@@ -79,6 +79,21 @@ jobs:
           SECRET_KEY: ci-test-secret
         run: python tests/test_gap_prioritization.py
 
+      - name: Run AI Provider Abstraction Unit Tests
+        env:
+          SECRET_KEY: ci-test-secret
+        run: python tests/test_ai_provider.py
+
+      - name: Run Job Recommender Unit Tests
+        env:
+          SECRET_KEY: ci-test-secret
+        run: python tests/test_job_recommender.py
+
+      - name: Run PDF Report Generator Unit Tests
+        env:
+          SECRET_KEY: ci-test-secret
+        run: python tests/test_report_generator.py
+
   docker-build:
     name: Build Docker Container Image
     needs: test

@@ -445,7 +445,7 @@
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">Analyzing with AI...</span>
         </div>
-        <p class="mt-2 text-muted small">Generating tailored bullet rewrites with Gemini AI...</p>
+        <p class="mt-2 text-muted small">Generating tailored bullet rewrites with AI...</p>
       </div>
 
       <div id="ai-error-alert" class="alert alert-info d-none" role="alert">
@@ -476,7 +476,7 @@
         <div class="spinner-border text-info" role="status">
           <span class="visually-hidden">Parsing Job Description...</span>
         </div>
-        <p class="mt-2 text-muted small">Extracting semantic requirements with Gemini AI...</p>
+        <p class="mt-2 text-muted small">Extracting semantic requirements with AI...</p>
       </div>
 
       <div id="ai-jd-error-alert" class="alert alert-info d-none" role="alert">
@@ -541,8 +541,8 @@ document.addEventListener("DOMContentLoaded", function () {
         btn.disabled = false;
 
         if (status !== 200 || data.error) {
-          if (status === 503 || (data.error && data.error.includes("GEMINI_API_KEY"))) {
-            errorText.innerHTML = "<strong>AI enhancements are optional.</strong> Set the <code>GEMINI_API_KEY</code> environment variable to enable bullet optimization and semantic JD analysis. Deterministic ATS scoring remains fully functional.";
+          if (status === 503) {
+            errorText.innerHTML = "<strong>AI enhancements are optional.</strong> Configure the selected AI provider to enable this feature. Deterministic ATS scoring remains fully functional.";
           } else {
             errorText.innerText = data.error || "AI service is currently unavailable.";
           }
@@ -614,8 +614,8 @@ document.addEventListener("DOMContentLoaded", function () {
         btnJd.disabled = false;
 
         if (status !== 200 || !data.success) {
-          if (status === 503 || (data.error && data.error.includes("Gemini"))) {
-            errorTextJd.innerHTML = "<strong>AI enhancements are optional.</strong> Set the <code>GEMINI_API_KEY</code> environment variable to enable semantic JD parsing. Deterministic ATS scoring remains fully functional.";
+          if (status === 503) {
+            errorTextJd.innerHTML = "<strong>AI enhancements are optional.</strong> Configure the selected AI provider to enable this feature. Deterministic ATS scoring remains fully functional.";
           } else {
             errorTextJd.innerText = data.error || "Unable to semantically parse job description.";
           }

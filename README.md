@@ -11,7 +11,7 @@ ResumeIQ is an intelligent Applicant Tracking System (ATS) resume matching and e
 - **Skill Extraction & Canonicalization:** Domain-based skill database covering 14+ technical domains, canonical name resolution, alias index mapping, and OR-condition alternative grouping.
 - **Fast Startup & Pre-Warming:** Background thread pre-warming loads SentenceTransformer weights on app launch, reducing first user submission latency to ~150ms.
 - **Interactive Web Dashboard & Reports:** Clean Bootstrap 5 web interface (`/`, `/analyze`, `/match`) with real-time loading feedback and downloadable PDF reports rendered via ReportLab.
-- **Comprehensive Test Suite:** 52 unit, integration, and synthetic dataset benchmark tests ensuring 100% regression safety.
+- **Comprehensive Test Suite:** 163 unit, integration, and synthetic dataset benchmark tests ensuring 100% regression safety across 13 test modules.
 - **Containerized Deployment:** Production-grade `Dockerfile`, `docker-compose.yml`, and `render.yaml` configured with non-root execution and Waitress WSGI serving.
 
 ---
@@ -242,7 +242,7 @@ ATS Resume Evaluator/
 ├── ai/                         # AI Provider Layer & Enhancement Modules
 │   ├── __init__.py
 │   ├── provider.py             # Unified AI provider abstraction & routing
-│   ├── local_provider.py       # Local HuggingFace transformers open-source provider (Qwen3-0.6B)
+│   ├── local_provider.py       # Local open-source GGUF inference engine (Qwen2.5-0.5B via llama.cpp)
 │   ├── gemini_provider.py      # Optional Gemini REST API provider
 │   ├── resume_improver.py      # Non-hallucination bullet optimization engine
 │   └── jd_semantic_parser.py   # Complex JD semantic schema parser
@@ -254,9 +254,9 @@ ATS Resume Evaluator/
 ├── docs/                       # Project specifications and progress tracking
 │   ├── PROJECT_SPEC.md
 │   └── PROJECT_PROGRESS.md
-└── tests/                      # Verification and benchmarking test suites (156 tests)
+└── tests/                      # Verification and benchmarking test suites (163 tests)
     ├── evaluation_dataset.json
-    ├── test_ai_provider.py      # 31 unit tests for provider abstraction & routing
+    ├── test_ai_provider.py      # 38 unit tests for provider abstraction & routing
     ├── test_ai_improver.py      # 8 unit tests for AI bullet optimization
     ├── test_jd_semantic_parser.py # 8 unit tests for AI JD semantic parsing
     ├── test_gap_analysis.py    # 15 unit tests for gap analysis engine
