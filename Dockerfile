@@ -15,10 +15,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements file first to optimize Docker layer caching
-COPY requirements.txt .
+COPY requirements-render.txt .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements-render.txt
 
 # Copy application code into container
 COPY . .
