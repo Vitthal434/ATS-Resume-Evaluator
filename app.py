@@ -29,13 +29,22 @@ def _warmup_model():
 
 
 def start_model_warmup():
-    """Start background model pre-warming daemon thread."""
+    """
+    Start background model pre-warming daemon thread.
+    Preserved for local development; disabled in low-memory deployment environments.
+    """
+    if os.environ.get("ENABLE_MODEL_WARMUP", "").lower() == "false":
+        return
+    if os.environ.get("AI_PROVIDER", "").lower() in ("none", "disabled", "off"):
+        return
+
     if os.environ.get("WERKZEUG_RUN_MAIN") == "true" or os.environ.get("WERKZEUG_RUN_MAIN") is None:
         thread = threading.Thread(target=_warmup_model, daemon=True, name="ModelWarmupThread")
         thread.start()
 
 
 start_model_warmup()
+
 
 app.jinja_env.filters["format_skill"] = format_skill
 

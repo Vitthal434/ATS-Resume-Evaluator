@@ -17,8 +17,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy requirements file first to optimize Docker layer caching
 COPY requirements-render.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements-render.txt
+# Install lightweight CPU-only PyTorch first (avoids multi-gigabyte CUDA dependencies)
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
+# Install remaining deterministic dependencies with CPU extra-index
+RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements-render.txt
 
 # Copy application code into container
 COPY . .
