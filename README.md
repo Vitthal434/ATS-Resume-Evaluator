@@ -1,6 +1,15 @@
 # ResumeIQ — ATS Resume Evaluator
 
-ResumeIQ is an intelligent Applicant Tracking System (ATS) resume matching and evaluation platform. It scores resumes against job descriptions, identifies skill gaps, calculates semantic and lexical text similarity, extracts experience and education, and provides downloadable PDF reports and tailored job recommendations.
+ResumeIQ is an intelligent Applicant Tracking System (ATS) resume matching and evaluation platform. It scores resumes against job descriptions, identifies skill gaps, calculates semantic and lexical text similarity, extracts experience and education, provides downloadable PDF reports, and recommends relevant career paths.
+
+---
+
+## 🚀 Live Demo
+
+- **Public Demo:** [Try ResumeIQ on Render](https://resumeiq-6baf.onrender.com)
+- **GitHub Repository:** [Vitthal434/ATS-Resume-Evaluator](https://github.com/Vitthal434/ATS-Resume-Evaluator)
+
+> **Note:** This deployment is a free public portfolio / college-project demonstration hosted on Render's free tier. All deterministic ATS scoring, skill matching, gap analysis, career recommendations, and PDF generation features are fully functional online.
 
 ---
 
@@ -9,20 +18,28 @@ ResumeIQ is an intelligent Applicant Tracking System (ATS) resume matching and e
 - **ATS Compatibility Scoring:** Multi-component weighted scoring algorithm (50% Skill Match, 30% Text Similarity, 20% Experience Match).
 - **Hybrid Similarity Engine:** Combines TF-IDF lexical vector matching (30%) with `SentenceTransformer` (`all-MiniLM-L6-v2`) semantic embeddings (70%).
 - **Skill Extraction & Canonicalization:** Domain-based skill database covering 14+ technical domains, canonical name resolution, alias index mapping, and OR-condition alternative grouping.
-- **Fast Startup & Pre-Warming:** Background thread pre-warming loads SentenceTransformer weights on app launch, reducing first user submission latency to ~150ms.
-- **Interactive Web Dashboard & Reports:** Clean Bootstrap 5 web interface (`/`, `/analyze`, `/match`) with real-time loading feedback and downloadable PDF reports rendered via ReportLab.
-- **Comprehensive Test Suite:** 163 unit, integration, and synthetic dataset benchmark tests ensuring 100% regression safety across 13 test modules.
+- **Partial & Transferable Skill Matching:** Conservative 50% partial credit for related/transferable technologies within the same domain.
+- **Experience & Education Analysis:** Heuristic extraction of candidate years of experience, degree level, and requirement alignment.
+- **Intelligent Gap Analysis:** Structured breakdown of missing, partial, and exact skills categorized by requirement urgency (CRITICAL, HIGH, MEDIUM, LOW).
+- **Prioritized Improvement Roadmap:** Deterministic 3-tier action plan (Immediate, Next, Optional) to guide resume optimization.
+- **Skill-Based Career Recommendations:** Deterministic matching against predefined career role profiles based on extracted candidate skills.
+- **Interactive Web Dashboard & Reports:** Clean Bootstrap 5 web interface (`/`, `/analyze`, `/match`) with real-time feedback and downloadable PDF reports rendered via ReportLab.
+- **Optional AI Resume Bullet Optimization:** AI-assisted suggestions to strengthen resume bullet points against job requirements without hallucination.
+- **Optional AI Semantic JD Parsing:** AI parsing of ambiguous job descriptions into structured requirement schemas.
+- **Comprehensive 163-Test Suite:** Unit, integration, and synthetic dataset benchmark tests ensuring 100% regression safety across 13 test modules.
 - **Containerized Deployment:** Production-grade `Dockerfile`, `docker-compose.yml`, and `render.yaml` configured with non-root execution and Waitress WSGI serving.
 
 ---
 
 ## Environment Variables
 
-| Variable | Description | Default (Dev) | Production |
-|----------|-------------|---------------|------------|
+| Variable | Description | Default (Dev) | Production / Render |
+|----------|-------------|---------------|---------------------|
 | `SECRET_KEY` | Flask session and CSRF security key | `resumeiq-default-dev-key` | Render Auto-Generated Secret |
 | `PORT` | Web server listening port | `5000` | Set dynamically by cloud host |
 | `WERKZEUG_RUN_MAIN` | Flask debug reloader process indicator | Auto-set by Flask | Unset in production |
+| `AI_PROVIDER` | Active AI provider (`local`, `gemini`, or `none`) | `local` | `none` (on free demo) |
+| `ENABLE_MODEL_WARMUP` | Pre-warm SentenceTransformer on launch | `true` | Auto-skipped if `AI_PROVIDER=none` |
 
 > **Production Note:** Set a strong random secret key in production environments:
 > ```bash
@@ -35,7 +52,7 @@ ResumeIQ is an intelligent Applicant Tracking System (ATS) resume matching and e
 
 1. **Clone the Repository:**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Vitthal434/ATS-Resume-Evaluator.git
    cd "ATS Resume Evaluator"
    ```
 
@@ -73,7 +90,7 @@ waitress-serve --host=0.0.0.0 --port=5000 wsgi:application
 ```
 
 ### Health Check Endpoint
-- **GET `/health`**: Returns `{"status": "ok"}` (lightweight JSON check for load balancers and deployment monitoring, avoiding SentenceTransformer invocation).
+- **GET `/health`**: Returns `{"status": "ok"}` (lightweight JSON check for load balancers and deployment monitoring, avoiding ML model invocation).
 
 ---
 
@@ -113,64 +130,63 @@ Access the containerized application at `http://localhost:5000`.
 
 ResumeIQ is configured for automated container deployment on **Render** using the repository's [`Dockerfile`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/Dockerfile) and [`render.yaml`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/render.yaml).
 
-### Platform Selection Rationale
-- **Render** was chosen because it natively supports Docker deployment from GitHub, provides an automated HTTP health check probe (`/health`), manages SSL certificates out of the box, and runs the application via Waitress WSGI without complex cloud infrastructure.
+### Platform Selection & Configuration
+- **Platform:** Render Free (Docker Web Service).
+- **Public Live Demo:** [https://resumeiq-6baf.onrender.com](https://resumeiq-6baf.onrender.com)
+- **WSGI Engine:** Waitress serving port `5000` with non-root security.
+- **Health Check Probe:** Automated HTTP `/health` probe.
 
-### Production Live URL (Placeholder)
-- `https://resumeiq.onrender.com`
+### Deployment Dependency Strategy
+The repository maintains two distinct dependency specifications:
+- [`requirements.txt`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/requirements.txt): Complete environment for local development including local open-source AI support (`llama-cpp-python`, `torch`, `transformers`).
+- [`requirements-render.txt`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/requirements-render.txt): Streamlined container dependencies paired with CPU-only PyTorch wheels for the lightweight free cloud deployment.
 
-### Deployment Steps (Step-by-Step)
-
-#### Method A: Render Blueprint (Recommended)
-1. Push your code to your GitHub repository.
-2. Log in to [Render Dashboard](https://dashboard.render.com/).
-3. Click **New +** -> **Blueprint**.
-4. Connect your GitHub repository containing `render.yaml`.
-5. Render will automatically detect `render.yaml`, set up the Docker Web Service, configure `SECRET_KEY`, and deploy.
-
-#### Method B: Manual Web Service Setup
-1. Log in to [Render Dashboard](https://dashboard.render.com/).
-2. Click **New +** -> **Web Service**.
-3. Connect your GitHub repository.
-4. Select **Docker** as the Environment.
-5. Set Health Check Path to `/health`.
-6. Add Environment Variable: `SECRET_KEY` = `<your-secure-random-secret>`.
-7. Click **Create Web Service**.
-
-### Cloud Troubleshooting Notes
-- **Cold Start Delay:** Free-tier container instances may spin down after inactivity. Initial request after spin-down may take ~15-30s while the container boots and SentenceTransformer weights load in memory.
-- **Memory Requirements:** Ensure container allocation is at least 512 MB RAM to accommodate PyTorch and SentenceTransformer embeddings.
+### Free-Tier Operational Notes
+- **Cold Start Behavior:** Free instances on Render spin down after 15 minutes of inactivity. When a request arrives after a spin-down, the service may take a short period to wake up and start serving requests.
+- **Memory Management:** To ensure reliable operation within the 512 MB memory limit, the public demo uses CPU-only wheels and loads models on demand during analysis rather than eagerly pre-warming during boot.
 
 ---
 
-## AI Enhancements & Provider Architecture (Stage 10A)
+## AI Enhancements & Provider Architecture
 
-ResumeIQ includes an AI provider abstraction layer supporting both local open-source models and optional API-based providers:
+ResumeIQ includes a modular AI provider abstraction layer supporting self-hosted open-source models and optional cloud API providers:
 
 1. **AI Resume Bullet Optimization:** Endpoint `POST /api/ai/improve` parses resume experience statements against JD requirements and suggests non-hallucinated bullet revisions.
 2. **AI Complex JD Semantic Parsing:** Endpoint `POST /api/ai/parse-jd` converts raw, ambiguous job descriptions into structured JSON schemas (required/preferred skills, alternative OR groups, experience requirements, education, and responsibilities).
 
 > **Architectural Guarantee:** AI capabilities are strictly optional explanation and parsing enhancements. The core deterministic ATS scoring engine (50% Skill Match, 30% Text Similarity, 20% Experience Match) remains 100% authoritative and works completely offline without any AI model or API key.
 
-### AI Configuration & Providers
+### Local Development vs. Hosted Demo Configuration
 
-| Provider | `AI_PROVIDER` | Default Model / GGUF | Requirements |
+- **Local Self-Hosted Usage (`AI_PROVIDER=local`):** Uses an open-source `Qwen2.5-0.5B-Instruct-GGUF` model via `llama-cpp-python` for fast, private, CPU-friendly inference with zero API fees.
+- **Optional API Usage (`AI_PROVIDER=gemini`):** Connects to Google Gemini 1.5 Flash via REST API when `GEMINI_API_KEY` is provided.
+- **Public Render Demo (`AI_PROVIDER=none`):** ResumeIQ uses an open-source local AI provider for self-hosted/local usage. The free Render demo runs with `AI_PROVIDER=none` to keep the public demo compatible with the platform's resource limits. All deterministic ATS features remain fully available online.
+
+### AI Configuration & Environment Variables
+
+| Provider | `AI_PROVIDER` | Engine / Model | Requirements |
 |---|---|---|---|
-| **Local Open-Source (Default)** | `local` | `Qwen/Qwen2.5-0.5B-Instruct-GGUF` (`qwen2.5-0.5b-instruct-q5_k_m.gguf`) | `llama-cpp-python` (CPU-safe, free, offline, ~140MB RAM) |
+| **Local Open-Source (Default)** | `local` | `Qwen/Qwen2.5-0.5B-Instruct-GGUF` (`qwen2.5-0.5b-instruct-q5_k_m.gguf`) | `llama-cpp-python` (CPU-safe, free, offline) |
 | **Local Qwen3 Override** | `local` | `Qwen/Qwen3-0.6B-GGUF` (`Qwen3-0.6B-Q8_0.gguf`) | Set `GGUF_REPO_ID` and `GGUF_FILENAME` |
+| **Direct Local GGUF Path** | `local` | Local `.gguf` file | Set `GGUF_MODEL_PATH="/path/to/model.gguf"` |
 | **Transformers Fallback** | `local` | `Qwen/Qwen3-0.6B` | Set `LOCAL_BACKEND=transformers` |
 | **Gemini API (Optional)** | `gemini` | `gemini-1.5-flash` | `GEMINI_API_KEY` environment variable |
+| **Public Demo / Offline Mode** | `none` | None | Deterministic ATS core only |
 
 ```bash
-# Default: Local AI provider via llama.cpp (no API key required)
+# Default: Local AI provider via llama.cpp (downloads GGUF automatically on first call)
 export AI_PROVIDER="local"
 export LOCAL_BACKEND="auto"
-export AI_BULLET_MAX_TOKENS="512"
+export AI_BULLET_MAX_TOKENS="256"
 export AI_JD_MAX_TOKENS="384"
+export AI_TEMPERATURE="0.1"
 
 # Optional: Switch to Gemini API
 export AI_PROVIDER="gemini"
 export GEMINI_API_KEY="your-gemini-api-key"
+
+# Public Demo / Disabled AI Mode
+export AI_PROVIDER="none"
 ```
 
 ---
@@ -226,7 +242,7 @@ python tests/test_evaluation_benchmark.py
 
 ```text
 ATS Resume Evaluator/
-├── Dockerfile                  # Production container definition (Python 3.12-slim + Waitress)
+├── Dockerfile                  # Production container definition (Python 3.12-slim + CPU PyTorch + Waitress)
 ├── docker-compose.yml          # Local container orchestration file
 ├── .dockerignore               # Docker build context exclusion rules
 ├── render.yaml                 # Render Cloud Deployment Blueprint specification
@@ -235,8 +251,8 @@ ATS Resume Evaluator/
 ├── wsgi.py                     # Production WSGI server entrypoint (Waitress + PORT env support)
 ├── matcher.py                  # ATS scoring algorithm & hybrid similarity engine
 ├── gap_analyzer.py             # Deterministic gap prioritization & roadmap engine
-├── text_similarity.py          # TF-IDF text similarity module
-├── job_recommender.py          # Canonical skill job recommendation engine
+├── text_similarity.py          # TF-IDF text similarity module (baseline reference)
+├── job_recommender.py          # Skill-based job recommendation engine
 ├── report_generator.py        # ReportLab PDF report generator & skill formatter
 ├── resume_parser.py           # PyPDF2 and python-docx text extraction
 ├── ai/                         # AI Provider Layer & Enhancement Modules
@@ -246,7 +262,8 @@ ATS Resume Evaluator/
 │   ├── gemini_provider.py      # Optional Gemini REST API provider
 │   ├── resume_improver.py      # Non-hallucination bullet optimization engine
 │   └── jd_semantic_parser.py   # Complex JD semantic schema parser
-├── requirements.txt            # Python dependencies
+├── requirements.txt            # Complete local Python dependencies (with llama-cpp-python)
+├── requirements-render.txt     # Lightweight Render deployment dependencies
 ├── .gitignore                  # Git ignore specifications
 ├── skills/                     # Domain skill databases & alias resolution
 ├── templates/                  # Jinja2 HTML templates (landing, analyze, dashboard, base)
