@@ -31,6 +31,182 @@ ResumeIQ is an intelligent Applicant Tracking System (ATS) resume matching and e
 
 ---
 
+## Application Architecture & Workflow
+
+ResumeIQ is built on a hybrid architecture that pairs a deterministic ATS evaluation engine with an optional local or cloud-based AI enhancement layer:
+
+```text
+Candidate Resume (PDF/DOCX)
+          +
+Job Description
+          ↓
+Presentation Layer
+Bootstrap 5.3 + Vanilla JavaScript + Jinja2
+          ↓
+Flask Web Application / Waitress
+          ↓
+Document & Text Processing
+PyPDF2 / python-docx
+          ↓
+Skill Extraction & Canonicalization
+14-Domain Skill Taxonomy
+          ↓
+Deterministic ATS Scoring Core
+          ├── 50% Skill Match
+          ├── 30% Hybrid Text Similarity
+          └── 20% Experience & Education
+          ↓
+     ┌────┴───────────────┐
+     ↓                    ↓
+Gap Analysis        Downstream Services
+& Roadmap           Career Recommendations
+                    ReportLab PDF Reports
+                    Interactive Dashboard
+     │
+     └────────────┬────────────┘
+                  ↓
+       Optional AI Enhancement
+       ├── Qwen2.5-0.5B GGUF
+       │   via llama-cpp-python
+       └── Google Gemini 1.5 Flash
+```
+
+### End-to-End Execution Flow
+
+1. **Upload & Parse:** Accepts candidate resumes in PDF, DOC, or DOCX format alongside raw job description text. `resume_parser.py` uses PyPDF2 and python-docx to extract, sanitize, and normalize text streams.
+2. **Skill Extraction & Normalization:** The `skills/` module scans text against a 14-domain skill taxonomy, resolves aliases and abbreviations to canonical tokens via `ALIAS_INDEX`, and groups OR-condition alternatives.
+3. **ATS Scoring:** `matcher.py` computes an authoritative, weighted ATS compatibility score using the 50/30/20 formula (50% exact, partial, and OR-group skill match; 30% hybrid lexical/semantic similarity; 20% experience and education alignment).
+4. **Gap Analysis & Roadmap:** `gap_analyzer.py` classifies requirements into exact matches, partial matches, and missing skills, prioritizing gaps across `CRITICAL`, `HIGH`, `MEDIUM`, and `LOW` tiers to generate a 3-tier action roadmap (`Immediate`, `Next`, `Optional`).
+5. **Career Recommendations:** `job_recommender.py` evaluates extracted candidate skills against predefined career role profiles to suggest matching job paths.
+6. **Report Generation:** `report_generator.py` compiles evaluation metrics into a publication-quality, downloadable multi-page PDF using ReportLab, while `app.py` renders the interactive web dashboard.
+7. **Optional AI Enhancements:** The `ai/` module provides non-hallucinated resume bullet optimizations and complex JD semantic schema parsing via local GGUF (`Qwen2.5-0.5B-Instruct-GGUF` via `llama-cpp-python`) or optional Google Gemini API.
+
+---
+
+## Technology Stack
+
+### Core Language & Web Application
+
+| Category | Technology | Role in ResumeIQ |
+|---|---|---|
+| Programming Language | Python 3.12 | Core language for backend logic, parsers, scoring algorithms, and test suites |
+| Web Framework | Flask | Request routing, session management, file upload validation, and REST API endpoints |
+| WSGI Server | Waitress | Production-grade multi-threaded WSGI server for Windows and Linux container execution |
+| Template Engine | Jinja2 | Server-side HTML template rendering with custom formatting filters |
+
+### Machine Learning & NLP
+
+| Category | Technology | Role in ResumeIQ |
+|---|---|---|
+| Lexical Vectorization | Scikit-learn (TF-IDF) | Sublinear TF-IDF n-gram vectorization for 30% lexical text similarity matching |
+| Vector Similarity | Cosine Similarity | Mathematical cosine similarity computation between resume and JD vector spaces |
+| Dense Semantic NLP | Sentence Transformers (`all-MiniLM-L6-v2`) | 384-dimensional dense neural embeddings for 70% semantic similarity matching |
+| Deep Learning Runtime | PyTorch (CPU) | CPU-optimized tensor computation engine for SentenceTransformer embeddings |
+| Model Weight Hub | Hugging Face Hub | Automated downloading and local caching of transformer and GGUF model weights |
+| Local AI Engine | `llama-cpp-python` | High-performance C++ quantized GGUF inference engine for offline CPU execution |
+| Local LLM Model | Qwen2.5-0.5B-Instruct-GGUF | Quantized (Q5_K_M) local open-source LLM for resume bullet optimization and JD parsing |
+| Cloud AI Provider | Google Gemini API (1.5 Flash) | Optional cloud-based LLM provider accessed via REST API when configured |
+
+### Document Processing & Report Generation
+
+| Category | Technology | Role in ResumeIQ |
+|---|---|---|
+| PDF Extraction | PyPDF2 | Page-by-page text extraction and sanitization from candidate PDF resumes |
+| DOCX Extraction | python-docx | Paragraph and structural text parsing from Microsoft Word (.docx) resumes |
+| PDF Generation | ReportLab | Programmatic generation of multi-page, formatted PDF evaluation reports |
+
+### Frontend
+
+| Category | Technology | Role in ResumeIQ |
+|---|---|---|
+| Markup | HTML5 | Semantic page structure and document hierarchy |
+| CSS Framework | Bootstrap 5.3 | Responsive grid layout, modals, progress bars, cards, and utility classes |
+| Icon Library | Bootstrap Icons (1.11.3) | UI symbols and category indicators across landing, analyze, and dashboard views |
+| Custom Styling | Vanilla CSS3 | Dark-accented design system, glassmorphism effects, and responsive styling |
+| Client-Side Logic | Vanilla JavaScript (ES6+) | Drag-and-drop file upload, file validation, dynamic word counts, and UI state handling |
+| Asynchronous Requests | Fetch API | Client-side asynchronous communication with AI enhancement and gap analysis endpoints |
+| Template Integration | Jinja2 Templates | Modular HTML component structure (`base.html`, `landing.html`, `analyze.html`, `dashboard.html`) |
+
+### Containerization, Deployment & CI/CD
+
+| Category | Technology | Role in ResumeIQ |
+|---|---|---|
+| Containerization | Docker | Production container packaging with non-root security execution (`appuser`, UID 1000) |
+| Local Orchestration | Docker Compose | Local multi-platform container orchestration and service configuration |
+| Cloud Platform | Render | Free-tier Docker web service hosting with automated `/health` monitoring |
+| Continuous Integration | GitHub Actions | Automated CI pipeline running the 163-test regression suite on push and PR |
+| Server Interface | WSGI | Standardized Web Server Gateway Interface via `wsgi.py` |
+
+### Testing & Quality Assurance
+
+| Category | Technology | Role in ResumeIQ |
+|---|---|---|
+| Unit Testing | Python `unittest` | Native test runner executing unit and integration test suites |
+| Mocking Framework | `unittest.mock` | Mocking external AI providers, network calls, and file operations |
+| Integration Testing | Flask Test Client | End-to-end HTTP route and endpoint validation (including `/health` and `/match`) |
+| Regression Testing | 163-Test Suite | Comprehensive automated test coverage across 13 test modules |
+| Benchmark Testing | Synthetic Dataset Benchmark | Cross-domain evaluation across 15 synthetic candidate/JD test cases |
+
+---
+
+## ATS Scoring Methodology
+
+ResumeIQ calculates an authoritative, deterministic ATS compatibility score using a 3-part weighted formula:
+
+```text
+ATS Score =
+(0.50 × Skill Score)
++ (0.30 × Text Similarity)
++ (0.20 × Experience Score)
+```
+
+### Skill Match — 50%
+
+The skill score evaluates candidate skills against job description requirements using a 14-domain technical taxonomy:
+
+- **Exact & Alias Matching:** Candidate skills matching required or general JD skills receive full credit (1.0). Synonyms and abbreviations are normalized to canonical forms via `ALIAS_INDEX`:
+  ```text
+  js       → javascript
+  postgres → postgresql
+  k8s      → kubernetes
+  ```
+- **OR-Condition Groups:** When a job description specifies alternative requirements (e.g., `["react", "angular", "vue"]`), possessing any one of the listed skills grants full credit for that requirement group.
+- **Partial Credit for Transferable Skills:** Candidate skills that are closely related within the same technical domain receive 50% partial credit (`0.5` factor) to acknowledge transferable domain competency (e.g., `fastapi` ↔ `django`).
+
+### Hybrid Text Similarity — 30%
+
+Text similarity measures the broader context and domain alignment between the full resume and the job description using a hybrid of lexical vectorization and dense neural embeddings:
+
+```text
+Text Similarity =
+(0.30 × TF-IDF Similarity)
++ (0.70 × Semantic Similarity)
+```
+
+- **30% TF-IDF Lexical Similarity:** Evaluated using `TfidfVectorizer` with sublinear term-frequency scaling and `cosine_similarity` from `scikit-learn` to capture shared domain vocabulary and exact keyword alignment.
+- **70% Semantic Similarity:** Evaluated using `SentenceTransformer("all-MiniLM-L6-v2")` to generate 384-dimensional dense semantic embeddings and calculate semantic cosine similarity, capturing conceptual relevance even when different phrasing is used.
+
+### Experience & Education — 20%
+
+The experience score assesses candidate seniority and academic qualification alignment:
+
+- **Work History & Years of Experience:** Regex heuristics parse work history durations and total years of professional experience from the resume.
+- **Degree Level Alignment:** Extracts academic credentials (e.g., Bachelor's, Master's, PhD) and matches them against stated JD prerequisites.
+- **Requirement Comparison:** Compares candidate metrics against stated JD minimum thresholds to assign proportional experience credit.
+
+### Fit Categorization
+
+Based on the final composite ATS score, candidates are classified into four transparent fit tiers:
+
+| ATS Score | Fit Category | Description |
+|---|---|---|
+| ≥ 85% | **Excellent Fit** | Strong alignment across required skills, semantic content, and experience requirements |
+| 70%–84% | **Good Fit** | Solid qualification match with minor skill or experience gaps |
+| 50%–69% | **Fair Fit** | Moderate alignment with noticeable skill gaps or partial transferable matches |
+| < 50% | **Needs Improvement** | Significant gaps in core required skills or domain experience |
+
+---
+
 ## Environment Variables
 
 | Variable | Description | Default (Dev) | Production / Render |
@@ -53,7 +229,7 @@ ResumeIQ is an intelligent Applicant Tracking System (ATS) resume matching and e
 1. **Clone the Repository:**
    ```bash
    git clone https://github.com/Vitthal434/ATS-Resume-Evaluator.git
-   cd "ATS Resume Evaluator"
+   cd ATS-Resume-Evaluator
    ```
 
 2. **Set Up Virtual Environment:**
@@ -128,7 +304,7 @@ Access the containerized application at `http://localhost:5000`.
 
 ## Cloud Deployment (Render)
 
-ResumeIQ is configured for automated container deployment on **Render** using the repository's [`Dockerfile`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/Dockerfile) and [`render.yaml`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/render.yaml).
+ResumeIQ is configured for automated container deployment on **Render** using the repository's [`Dockerfile`](./Dockerfile) and [`render.yaml`](./render.yaml).
 
 ### Platform Selection & Configuration
 - **Platform:** Render Free (Docker Web Service).
@@ -138,8 +314,8 @@ ResumeIQ is configured for automated container deployment on **Render** using th
 
 ### Deployment Dependency Strategy
 The repository maintains two distinct dependency specifications:
-- [`requirements.txt`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/requirements.txt): Complete environment for local development including local open-source AI support (`llama-cpp-python`, `torch`, `transformers`).
-- [`requirements-render.txt`](file:///c:/Users/DELL/Documents/ATS%20Resume%20Evaluator/ATS-Resume-Evaluator/requirements-render.txt): Streamlined container dependencies paired with CPU-only PyTorch wheels for the lightweight free cloud deployment.
+- [`requirements.txt`](./requirements.txt): Complete environment for local development including local open-source AI support (`llama-cpp-python`, `torch`, `transformers`).
+- [`requirements-render.txt`](./requirements-render.txt): Streamlined container dependencies paired with CPU-only PyTorch wheels for the lightweight free cloud deployment.
 
 ### Free-Tier Operational Notes
 - **Cold Start Behavior:** Free instances on Render spin down after 15 minutes of inactivity. When a request arrives after a spin-down, the service may take a short period to wake up and start serving requests.
